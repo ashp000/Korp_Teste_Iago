@@ -36,20 +36,6 @@
       </mat-card>
     </div>
 
-    @if (produtosSaldoBaixo().length > 0) {
-      <div class="alert-banner">
-        <mat-icon>error_outline</mat-icon>
-        <div class="alert-content">
-          <span class="alert-title">Alerta de estoque baixo</span>
-          <span class="alert-summary">
-            {{ produtosSaldoBaixo().length }} produto(s):
-            {{ produtosSaldoBaixo().map((p) => p.codigo).join(', ') }}
-          </span>
-        </div>
-        <a routerLink="/produtos" class="alert-link">Ajustar estoque</a>
-      </div>
-    }
-
     <div class="actions">
       <a mat-flat-button color="primary" routerLink="/produtos">
         <mat-icon>inventory_2</mat-icon>
