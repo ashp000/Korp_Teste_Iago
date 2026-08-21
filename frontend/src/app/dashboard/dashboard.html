@@ -47,6 +47,26 @@
       </a>
     </div>
 
+    @if (notasRecentes().length > 0) {
+      <mat-card class="recentes-card">
+        <mat-card-header>
+          <mat-card-title>Notas recentes</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @for (nota of notasRecentes(); track nota.id) {
+            <a [routerLink]="['/notas-fiscais', nota.id]" class="recente-row">
+              <span class="recente-numero">#{{ nota.numero }}</span>
+              <mat-chip [class]="nota.status === 'Aberta' ? 'chip-blue' : 'chip-green'">
+                {{ nota.status }}
+              </mat-chip>
+              <span class="recente-data">{{ nota.dataAbertura | date: 'dd/MM/yyyy HH:mm' }}</span>
+              <span class="recente-itens">{{ nota.itens.length }} item(ns)</span>
+            </a>
+          }
+        </mat-card-content>
+      </mat-card>
+    }
+
     @if (produtosSaldoBaixo().length > 0) {
       <a
         routerLink="/produtos"

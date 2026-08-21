@@ -128,3 +128,57 @@
   align-items: center;
   justify-content: center;
 }
+
+.recentes-card {
+  ::ng-deep .mat-mdc-card-content {
+    display: flex;
+    flex-direction: column;
+    padding-top: 0 !important;
+  }
+}
+
+.recente-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #f1f5f9;
+  color: inherit;
+  text-decoration: none;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: #f8fafc;
+  }
+}
+
+.recente-numero {
+  font-weight: 600;
+  width: 56px;
+  flex-shrink: 0;
+}
+
+.recente-data {
+  flex: 1;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.recente-itens {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+mat-chip.chip-blue {
+  --mat-chip-label-text-color: #1d4ed8;
+  background-color: #dbeafe !important;
+}
+
+mat-chip.chip-green {
+  --mat-chip-label-text-color: #059669;
+  background-color: #d1fae5 !important;
+}

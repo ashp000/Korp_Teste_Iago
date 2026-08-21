@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatChipsModule } from '@angular/material/chips';
 import { finalize, forkJoin } from 'rxjs';
 import { ProdutoService } from '../core/services/produto.service';
 import { NotaFiscalService } from '../core/services/nota-fiscal.service';
@@ -23,7 +24,8 @@ const SALDO_BAIXO_LIMITE = 5;
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatChipsModule
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
@@ -39,6 +41,7 @@ export class DashboardComponent implements OnInit {
   produtosSaldoBaixo = signal<Produto[]>([]);
   notasAbertas = signal(0);
   notasFechadas = signal(0);
+  notasRecentes = signal<NotaFiscal[]>([]);
 
   ngOnInit(): void {
     // forkJoin dispara as duas listagens em paralelo e só emite quando ambas responderem —
@@ -50,6 +53,11 @@ export class DashboardComponent implements OnInit {
         this.produtosSaldoBaixo.set(produtos.filter((p) => p.saldo < SALDO_BAIXO_LIMITE));
         this.notasAbertas.set(notas.filter((n) => n.status === 'Aberta').length);
         this.notasFechadas.set(notas.filter((n) => n.status === 'Fechada').length);
+
+        const porDataDesc = [...notas].sort(
+          (a, b) => new Date(b.dataAbertura).getTime() - new Date(a.dataAbertura).getTime()
+        );
+        this.notasRecentes.set(porDataDesc.slice(0, 5));
       });
   }
 
