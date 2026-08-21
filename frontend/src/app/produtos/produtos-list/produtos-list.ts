@@ -1,7 +1,7 @@
 import { AfterViewChecked, Component, DestroyRef, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroupDirective, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -59,6 +59,7 @@ export class ProdutosListComponent implements OnInit, AfterViewChecked {
 
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(FormGroupDirective) formDirective!: FormGroupDirective;
 
   form = this.fb.nonNullable.group({
     codigo: ['', [Validators.required, Validators.maxLength(50)]],
@@ -128,7 +129,10 @@ export class ProdutosListComponent implements OnInit, AfterViewChecked {
       .pipe(finalize(() => this.salvando.set(false)))
       .subscribe(() => {
         this.notification.success('Produto cadastrado com sucesso.');
-        this.form.reset({ codigo: '', descricao: '', saldo: 0 });
+        // resetForm() (não form.reset()) também limpa o estado "submitted" do <form>,
+        // senão o Material continua mostrando erro nos campos obrigatórios vazios mesmo
+        // resetados, porque o formulário já foi submetido uma vez.
+        this.formDirective.resetForm({ codigo: '', descricao: '', saldo: 0 });
         this.carregar();
       });
   }
