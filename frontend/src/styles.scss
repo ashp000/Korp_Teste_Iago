@@ -28,15 +28,6 @@ body {
 
 /* You can add global styles to this file, and also import other style files */
 
-// Toast de aviso (ex: alerta de estoque baixo no dashboard) — mesma paleta âmbar
-// usada nos indicadores de saldo baixo do resto da aplicação.
-.snackbar-warning {
-  --mdc-snackbar-container-color: #fffbeb;
-  --mdc-snackbar-supporting-text-color: #92400e;
-  --mat-snack-bar-button-color: #b45309;
-  border: 1px solid #fde68a;
-}
-
 // Layout do app (sidenav, toolbar, snackbars) não deve aparecer quando o navegador abre o
 // diálogo de impressão a partir da tela de detalhe da nota (window.print()).
 @media print {

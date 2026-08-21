@@ -46,5 +46,17 @@
         Nova nota fiscal
       </a>
     </div>
+
+    @if (produtosSaldoBaixo().length > 0) {
+      <a
+        routerLink="/produtos"
+        class="low-stock-badge"
+        [matTooltip]="tooltipSaldoBaixo()"
+        matTooltipPosition="left"
+      >
+        <mat-icon>warning</mat-icon>
+        <span class="low-stock-count">{{ produtosSaldoBaixo().length }}</span>
+      </a>
+    }
   }
 </div>

@@ -1,11 +1,11 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { finalize, forkJoin } from 'rxjs';
 import { ProdutoService } from '../core/services/produto.service';
 import { NotaFiscalService } from '../core/services/nota-fiscal.service';
@@ -16,15 +16,21 @@ const SALDO_BAIXO_LIMITE = 5;
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, RouterLink, MatCardModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule],
+  imports: [
+    CommonModule,
+    RouterLink,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatTooltipModule
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
 export class DashboardComponent implements OnInit {
   private produtoService = inject(ProdutoService);
   private notaFiscalService = inject(NotaFiscalService);
-  private snackBar = inject(MatSnackBar);
-  private router = inject(Router);
 
   readonly limiteSaldoBaixo = SALDO_BAIXO_LIMITE;
 
@@ -41,27 +47,13 @@ export class DashboardComponent implements OnInit {
       .pipe(finalize(() => this.carregando.set(false)))
       .subscribe(([produtos, notas]: [Produto[], NotaFiscal[]]) => {
         this.totalProdutos.set(produtos.length);
-        const saldoBaixo = produtos.filter((p) => p.saldo < SALDO_BAIXO_LIMITE);
-        this.produtosSaldoBaixo.set(saldoBaixo);
+        this.produtosSaldoBaixo.set(produtos.filter((p) => p.saldo < SALDO_BAIXO_LIMITE));
         this.notasAbertas.set(notas.filter((n) => n.status === 'Aberta').length);
         this.notasFechadas.set(notas.filter((n) => n.status === 'Fechada').length);
-
-        if (saldoBaixo.length > 0) {
-          this.avisarSaldoBaixo(saldoBaixo);
-        }
       });
   }
 
-  // Notificação em toast no canto da tela em vez de um banner fixo no meio do dashboard —
-  // avisa sobre o estoque baixo sem ocupar espaço permanente nem parecer um erro do sistema.
-  private avisarSaldoBaixo(produtos: Produto[]): void {
-    const codigos = produtos.map((p) => p.codigo).join(', ');
-    const ref = this.snackBar.open(`Estoque baixo: ${codigos}`, 'Ver produtos', {
-      duration: 8000,
-      horizontalPosition: 'end',
-      verticalPosition: 'top',
-      panelClass: 'snackbar-warning'
-    });
-    ref.onAction().subscribe(() => this.router.navigate(['/produtos']));
+  tooltipSaldoBaixo(): string {
+    return 'Estoque baixo: ' + this.produtosSaldoBaixo().map((p) => `${p.codigo} (${p.saldo})`).join(', ');
   }
 }
