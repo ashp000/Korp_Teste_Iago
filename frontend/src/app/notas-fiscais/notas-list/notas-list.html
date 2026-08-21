@@ -6,7 +6,7 @@
       <div class="filtros">
         <mat-button-toggle-group
           [value]="filtroStatus()"
-          (change)="filtroStatus.set($event.value)"
+          (change)="onFiltroStatusChange($event.value)"
           aria-label="Filtrar por status"
         >
           <mat-button-toggle value="Todas">Todas</mat-button-toggle>
@@ -22,7 +22,7 @@
       </div>
 
       <div class="table-scroll">
-        <table mat-table [dataSource]="notasFiltradas()" class="mat-elevation-z1">
+        <table mat-table [dataSource]="notasPaginadas()" class="mat-elevation-z1">
           <ng-container matColumnDef="numero">
             <th mat-header-cell *matHeaderCellDef>Número</th>
             <td mat-cell *matCellDef="let nota">#{{ nota.numero }}</td>
@@ -63,6 +63,14 @@
             Nenhuma nota encontrada com esse filtro.
           }
         </p>
+      } @else {
+        <mat-paginator
+          [length]="notasFiltradas().length"
+          [pageSize]="pageSize"
+          [pageIndex]="pageIndex()"
+          (page)="onPageChange($event)"
+          showFirstLastButtons
+        ></mat-paginator>
       }
     }
   </mat-card>
