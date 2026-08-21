@@ -1,0 +1,47 @@
+.page {
+  padding: 1.5rem;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.itens {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.item-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.produto-field {
+  flex: 1;
+}
+
+.quantidade-field {
+  width: 140px;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 1rem;
+  }
+
+  .item-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .quantidade-field {
+    width: 100%;
+  }
+}

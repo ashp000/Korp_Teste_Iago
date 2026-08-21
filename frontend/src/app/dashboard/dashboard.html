@@ -1,0 +1,65 @@
+<div class="page">
+  @if (carregando()) {
+    <div class="loading"><mat-spinner diameter="32"></mat-spinner></div>
+  } @else {
+    <div class="cards">
+      <mat-card class="stat-card">
+        <div class="stat-icon blue"><mat-icon>inventory_2</mat-icon></div>
+        <div>
+          <div class="stat-value">{{ totalProdutos() }}</div>
+          <div class="stat-label">Produtos cadastrados</div>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card" [class.alert]="produtosSaldoBaixo().length > 0">
+        <div class="stat-icon amber"><mat-icon>warning</mat-icon></div>
+        <div>
+          <div class="stat-value">{{ produtosSaldoBaixo().length }}</div>
+          <div class="stat-label">Saldo baixo (&lt; {{ limiteSaldoBaixo }})</div>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <div class="stat-icon slate"><mat-icon>schedule</mat-icon></div>
+        <div>
+          <div class="stat-value">{{ notasAbertas() }}</div>
+          <div class="stat-label">Notas abertas</div>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <div class="stat-icon emerald"><mat-icon>task_alt</mat-icon></div>
+        <div>
+          <div class="stat-value">{{ notasFechadas() }}</div>
+          <div class="stat-label">Notas emitidas</div>
+        </div>
+      </mat-card>
+    </div>
+
+    @if (produtosSaldoBaixo().length > 0) {
+      <mat-card class="alert-banner">
+        <mat-icon color="warn">error_outline</mat-icon>
+        <div class="alert-content">
+          <strong>Alerta de estoque baixo</strong>
+          <ul class="saldo-baixo-list">
+            @for (produto of produtosSaldoBaixo(); track produto.id) {
+              <li>{{ produto.codigo }} — {{ produto.descricao }} (saldo: {{ produto.saldo }})</li>
+            }
+          </ul>
+        </div>
+        <a mat-flat-button color="accent" routerLink="/produtos">Ajustar estoque</a>
+      </mat-card>
+    }
+
+    <div class="actions">
+      <a mat-flat-button color="primary" routerLink="/produtos">
+        <mat-icon>inventory_2</mat-icon>
+        Ver produtos
+      </a>
+      <a mat-stroked-button routerLink="/notas-fiscais/nova">
+        <mat-icon>add</mat-icon>
+        Nova nota fiscal
+      </a>
+    </div>
+  }
+</div>

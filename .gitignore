@@ -1,0 +1,21 @@
+﻿# .NET
+bin/
+obj/
+*.user
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+
+# Ambiente
+.env
+appsettings.Development.json
+
+# IDE
+.vs/
+.vscode/*
+!.vscode/extensions.json
+
+# Claude Code (config local, não é parte do projeto)
+.claude/

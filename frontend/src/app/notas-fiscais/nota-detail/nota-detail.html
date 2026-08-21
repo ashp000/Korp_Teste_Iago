@@ -1,0 +1,128 @@
+<div class="page">
+  @if (carregando()) {
+    <div class="loading"><mat-spinner diameter="32"></mat-spinner></div>
+  } @else if (nota(); as n) {
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Nota fiscal nº {{ n.numero }}</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <mat-chip [color]="n.status === 'Aberta' ? 'primary' : undefined" selected>{{ n.status }}</mat-chip>
+
+        <p>Aberta em: {{ n.dataAbertura | date: 'dd/MM/yyyy HH:mm' }}</p>
+        @if (n.dataFechamento) {
+          <p>Fechada em: {{ n.dataFechamento | date: 'dd/MM/yyyy HH:mm' }}</p>
+        }
+
+        @if (editando()) {
+          <form [formGroup]="form" class="edit-itens-form">
+            <div formArrayName="itens" class="itens">
+              @for (item of itens.controls; track item; let i = $index) {
+                <div [formGroupName]="i" class="item-row">
+                  <mat-form-field appearance="outline" class="produto-field">
+                    <mat-label>Produto</mat-label>
+                    <mat-select formControlName="produtoId">
+                      @for (produto of produtos(); track produto.id) {
+                        <mat-option [value]="produto.id">
+                          {{ produto.codigo }} — {{ produto.descricao }} (saldo: {{ produto.saldo }})
+                        </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="quantidade-field">
+                    <mat-label>Quantidade</mat-label>
+                    <input matInput type="number" formControlName="quantidade" min="1" />
+                  </mat-form-field>
+
+                  <button
+                    mat-icon-button
+                    type="button"
+                    (click)="removerItem(i)"
+                    [disabled]="itens.length === 1"
+                    matTooltip="Remover item"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              }
+            </div>
+
+            <button mat-stroked-button type="button" (click)="adicionarItem()">
+              <mat-icon>add</mat-icon>
+              Adicionar produto
+            </button>
+          </form>
+        } @else {
+          <div class="table-scroll">
+            <table mat-table [dataSource]="n.itens" class="mat-elevation-z1">
+              <ng-container matColumnDef="produtoCodigo">
+                <th mat-header-cell *matHeaderCellDef>Produto</th>
+                <td mat-cell *matCellDef="let item">{{ item.produtoCodigo }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="quantidade">
+                <th mat-header-cell *matHeaderCellDef>Quantidade</th>
+                <td mat-cell *matCellDef="let item">{{ item.quantidade }}</td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+            </table>
+          </div>
+        }
+
+        @if (erroImpressao()) {
+          <div class="erro-impressao">
+            <mat-icon color="warn">error_outline</mat-icon>
+            <span>{{ erroImpressao() }}</span>
+          </div>
+        }
+      </mat-card-content>
+
+      <mat-card-actions>
+        <a mat-button routerLink="/notas-fiscais">Voltar</a>
+        <span class="spacer"></span>
+
+        @if (editando()) {
+          <button mat-button (click)="cancelarEdicao()" [disabled]="salvandoEdicao()">Cancelar</button>
+          <button mat-flat-button color="primary" (click)="salvarEdicao()" [disabled]="salvandoEdicao()">
+            @if (salvandoEdicao()) {
+              <mat-spinner diameter="18"></mat-spinner>
+            } @else {
+              Salvar itens
+            }
+          </button>
+        } @else {
+          @if (n.status === 'Aberta') {
+            <button mat-stroked-button (click)="iniciarEdicao()" [disabled]="imprimindo()">
+              <mat-icon>edit</mat-icon>
+              Editar itens
+            </button>
+          }
+
+          @if (n.status === 'Fechada') {
+            <button mat-stroked-button (click)="baixarPdf(n)">
+              <mat-icon>download</mat-icon>
+              Baixar PDF
+            </button>
+          }
+
+          <button mat-flat-button color="primary" (click)="onImprimirClick()" [disabled]="imprimindo()">
+            @if (imprimindo()) {
+              <mat-spinner diameter="18"></mat-spinner>
+              <span>Imprimindo...</span>
+            } @else if (estoqueIndisponivel()) {
+              Tentar novamente
+            } @else if (n.status === 'Fechada') {
+              Imprimir novamente
+            } @else {
+              Imprimir
+            }
+          </button>
+        }
+      </mat-card-actions>
+    </mat-card>
+  }
+</div>

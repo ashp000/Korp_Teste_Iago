@@ -1,0 +1,22 @@
+import { HttpContextToken, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { catchError, throwError } from 'rxjs';
+import { NotificationService } from '../services/notification.service';
+
+// Requests que tratam o próprio erro (ex: imprimir nota, com UI dedicada para 409/400/503)
+// usam este token para pular o toast genérico do interceptor e evitar mensagem duplicada.
+export const SKIP_GLOBAL_ERROR = new HttpContextToken<boolean>(() => false);
+
+export const errorInterceptor: HttpInterceptorFn = (req, next) => {
+  const notification = inject(NotificationService);
+
+  return next(req).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (!req.context.get(SKIP_GLOBAL_ERROR)) {
+        const mensagem = error.error?.detail ?? 'Ocorreu um erro inesperado. Tente novamente.';
+        notification.error(mensagem);
+      }
+      return throwError(() => error);
+    })
+  );
+};

@@ -1,0 +1,57 @@
+<div class="page">
+  <h2>Nova nota fiscal</h2>
+
+  <mat-card>
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="salvar()">
+        <div formArrayName="itens" class="itens">
+          @for (item of itens.controls; track item; let i = $index) {
+            <div [formGroupName]="i" class="item-row">
+              <mat-form-field appearance="outline" class="produto-field">
+                <mat-label>Produto</mat-label>
+                <mat-select formControlName="produtoId">
+                  @for (produto of produtos(); track produto.id) {
+                    <mat-option [value]="produto.id">
+                      {{ produto.codigo }} — {{ produto.descricao }} (saldo: {{ produto.saldo }})
+                    </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="quantidade-field">
+                <mat-label>Quantidade</mat-label>
+                <input matInput type="number" formControlName="quantidade" min="1" />
+              </mat-form-field>
+
+              <button
+                mat-icon-button
+                type="button"
+                (click)="removerItem(i)"
+                [disabled]="itens.length === 1"
+                matTooltip="Remover item"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+
+        <button mat-stroked-button type="button" (click)="adicionarItem()">
+          <mat-icon>add</mat-icon>
+          Adicionar produto
+        </button>
+
+        <div class="actions">
+          <a mat-button routerLink="/notas-fiscais">Cancelar</a>
+          <button mat-flat-button color="primary" type="submit" [disabled]="salvando()">
+            @if (salvando()) {
+              <mat-spinner diameter="18"></mat-spinner>
+            } @else {
+              Criar nota
+            }
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

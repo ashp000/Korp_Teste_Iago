@@ -1,0 +1,100 @@
+.page {
+  padding: 1.5rem;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.edit-itens-form {
+  margin: 1rem 0;
+}
+
+.itens {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.item-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.produto-field {
+  flex: 1;
+}
+
+.quantidade-field {
+  width: 140px;
+}
+
+.erro-impressao {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--mat-sys-error, #b3261e);
+  margin-top: 1rem;
+}
+
+mat-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 1rem;
+  }
+
+  .item-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .quantidade-field {
+    width: 100%;
+  }
+
+  mat-card-actions {
+    flex-wrap: wrap;
+  }
+}
+
+@media print {
+  .page {
+    max-width: none;
+    padding: 0;
+  }
+
+  mat-card-actions,
+  .erro-impressao {
+    display: none !important;
+  }
+
+  mat-card {
+    box-shadow: none !important;
+    border: none !important;
+  }
+}

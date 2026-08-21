@@ -1,0 +1,154 @@
+:host {
+  display: block;
+  height: 100vh;
+}
+
+.app-shell {
+  height: 100%;
+}
+
+.sidebar {
+  width: 260px;
+  background: #0f172a;
+  color: #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  border-right: none;
+
+  ::ng-deep .mat-drawer-inner-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+  h1 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: white;
+    line-height: 1;
+  }
+
+  span {
+    font-size: 0.75rem;
+    color: #94a3b8;
+  }
+}
+
+.brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 0.5rem;
+  background: #2563eb;
+  color: white;
+}
+
+mat-nav-list {
+  flex: 1;
+
+  // Os tokens M3 do mat-list definem a cor do texto/ícone via CSS custom properties
+  // internas (aplicadas em elementos gerados pelo MDC, ex: .mdc-list-item__primary-text) —
+  // sobrescrever só `a { color }` não é suficiente, então fixamos os tokens diretamente.
+  --mat-list-list-item-label-text-color: #cbd5e1;
+  --mat-list-list-item-leading-icon-color: #94a3b8;
+  --mat-list-list-item-hover-label-text-color: white;
+  --mat-list-list-item-hover-leading-icon-color: white;
+  --mat-list-list-item-hover-state-layer-color: rgba(255, 255, 255, 0.08);
+  --mat-list-list-item-focus-state-layer-color: rgba(255, 255, 255, 0.08);
+
+  a {
+    border-radius: 0.5rem;
+    margin-bottom: 0.25rem;
+
+    ::ng-deep .mdc-list-item__primary-text {
+      color: #cbd5e1;
+    }
+
+    &.active {
+      background: #2563eb;
+
+      ::ng-deep .mdc-list-item__primary-text {
+        color: white;
+      }
+
+      ::ng-deep .mat-icon {
+        color: white;
+      }
+    }
+  }
+}
+
+.sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.75rem;
+
+  strong {
+    display: block;
+    color: #e2e8f0;
+    font-size: 0.75rem;
+  }
+
+  p {
+    margin: 0;
+    color: #94a3b8;
+  }
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  flex-shrink: 0;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: white;
+  color: #0f172a;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: none;
+
+  h2 {
+    margin: 0 0 0 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.page-content {
+  padding: 1.5rem 2rem;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .page-content {
+    padding: 1rem;
+  }
+}

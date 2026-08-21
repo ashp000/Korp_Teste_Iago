@@ -1,0 +1,67 @@
+.page {
+  display: flex;
+  flex-direction: column;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.filtros {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.busca-field {
+  width: 100%;
+  max-width: 280px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+}
+
+.clickable-row {
+  cursor: pointer;
+
+  &:hover {
+    background: #f8fafc;
+  }
+}
+
+.empty {
+  text-align: center;
+  color: #64748b;
+  padding: 2rem 0;
+}
+
+mat-chip.chip-blue {
+  --mat-chip-label-text-color: #1d4ed8;
+  background-color: #dbeafe !important;
+}
+
+mat-chip.chip-green {
+  --mat-chip-label-text-color: #059669;
+  background-color: #d1fae5 !important;
+}
+
+@media (max-width: 600px) {
+  .filtros {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .busca-field {
+    max-width: none;
+  }
+}

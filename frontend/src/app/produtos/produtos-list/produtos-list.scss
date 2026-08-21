@@ -1,0 +1,84 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.produto-form {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+
+  mat-form-field {
+    flex: 1;
+    min-width: 160px;
+  }
+
+  .descricao-field {
+    flex: 2;
+    min-width: 220px;
+  }
+
+  .saldo-field {
+    flex: 0 0 120px;
+  }
+
+  button[type='submit'] {
+    margin-top: 8px;
+  }
+}
+
+.busca-field {
+  width: 100%;
+  max-width: 360px;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+}
+
+.empty {
+  text-align: center;
+  color: #64748b;
+  padding: 2rem 0;
+}
+
+mat-chip.chip-green {
+  --mat-chip-label-text-color: #059669;
+  background-color: #d1fae5 !important;
+}
+
+mat-chip.chip-amber {
+  --mat-chip-label-text-color: #d97706;
+  background-color: #fef3c7 !important;
+}
+
+mat-chip.chip-red {
+  --mat-chip-label-text-color: #dc2626;
+  background-color: #fee2e2 !important;
+}
+
+@media (max-width: 600px) {
+  .produto-form {
+    flex-direction: column;
+    align-items: stretch;
+
+    mat-form-field,
+    .descricao-field,
+    .saldo-field {
+      flex: none;
+      width: 100%;
+    }
+  }
+}

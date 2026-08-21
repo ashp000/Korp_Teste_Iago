@@ -1,0 +1,39 @@
+// Include theming for Angular Material with `mat.theme()`.
+// Paleta customizada pra aproximar do visual de referência (azul + cinza-ardósia,
+// no estilo de um ERP), mantendo os componentes reais do Angular Material.
+@use '@angular/material' as mat;
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Inter,
+      density: 0,
+    )
+  );
+}
+
+body {
+  color-scheme: light;
+  background-color: #f8fafc;
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+  height: 100%;
+}
+
+/* You can add global styles to this file, and also import other style files */
+
+// Layout do app (sidenav, toolbar, snackbars) não deve aparecer quando o navegador abre o
+// diálogo de impressão a partir da tela de detalhe da nota (window.print()).
+@media print {
+  mat-sidenav,
+  mat-toolbar,
+  .mat-mdc-snack-bar-container {
+    display: none !important;
+  }
+}

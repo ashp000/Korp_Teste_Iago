@@ -1,0 +1,108 @@
+<div class="page">
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title>Novo produto</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="salvar()" class="produto-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Código</mat-label>
+          <input matInput formControlName="codigo" maxlength="50" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="descricao-field">
+          <mat-label>Descrição</mat-label>
+          <input matInput formControlName="descricao" maxlength="200" />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="sugerirDescricao()"
+            [disabled]="sugerindo()"
+            matTooltip="Sugerir descrição com IA"
+          >
+            @if (sugerindo()) {
+              <mat-spinner diameter="18"></mat-spinner>
+            } @else {
+              <mat-icon>auto_awesome</mat-icon>
+            }
+          </button>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="saldo-field">
+          <mat-label>Saldo</mat-label>
+          <input matInput type="number" formControlName="saldo" min="0" />
+        </mat-form-field>
+
+        <button mat-flat-button color="primary" type="submit" [disabled]="salvando()">
+          @if (salvando()) {
+            <mat-spinner diameter="18"></mat-spinner>
+          } @else {
+            Salvar
+          }
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Produtos cadastrados</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      @if (carregando()) {
+        <div class="loading"><mat-spinner diameter="32"></mat-spinner></div>
+      } @else {
+        <mat-form-field appearance="outline" class="busca-field">
+          <mat-label>Buscar por código ou descrição</mat-label>
+          <input matInput [formControl]="busca" />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <div class="table-scroll">
+          <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z1">
+            <ng-container matColumnDef="codigo">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Código</th>
+              <td mat-cell *matCellDef="let produto">{{ produto.codigo }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="descricao">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Descrição</th>
+              <td mat-cell *matCellDef="let produto">{{ produto.descricao }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="saldo">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Saldo</th>
+              <td mat-cell *matCellDef="let produto">
+                <mat-chip [class]="produto.saldo === 0 ? 'chip-red' : produto.saldo < 5 ? 'chip-amber' : 'chip-green'">
+                  {{ produto.saldo }} un
+                </mat-chip>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="acoes">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let produto">
+                <button mat-icon-button (click)="editar(produto)" matTooltip="Editar">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="excluir(produto)" matTooltip="Excluir">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+        </div>
+
+        @if (dataSource.data.length === 0) {
+          <p class="empty">Nenhum produto cadastrado ainda.</p>
+        } @else {
+          <mat-paginator [pageSizeOptions]="[5, 10, 25]" pageSize="10" showFirstLastButtons></mat-paginator>
+        }
+      }
+    </mat-card-content>
+  </mat-card>
+</div>
