@@ -54,6 +54,22 @@ table {
   padding: 2rem 0;
 }
 
+.mat-column-saldo {
+  text-align: center;
+}
+
+mat-chip.chip-green,
+mat-chip.chip-amber,
+mat-chip.chip-red {
+  width: 72px;
+  justify-content: center;
+
+  ::ng-deep .mdc-evolution-chip__text-label {
+    width: 100%;
+    text-align: center;
+  }
+}
+
 mat-chip.chip-green {
   --mat-chip-label-text-color: #059669;
   background-color: #d1fae5 !important;
