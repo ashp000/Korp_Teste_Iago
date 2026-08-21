@@ -100,7 +100,7 @@
         @if (dataSource.data.length === 0) {
           <p class="empty">Nenhum produto cadastrado ainda.</p>
         } @else {
-          <mat-paginator [pageSizeOptions]="[5, 10, 25]" pageSize="10" showFirstLastButtons></mat-paginator>
+          <mat-paginator [pageSizeOptions]="[8, 25, 50]" pageSize="8" showFirstLastButtons></mat-paginator>
         }
       }
     </mat-card-content>

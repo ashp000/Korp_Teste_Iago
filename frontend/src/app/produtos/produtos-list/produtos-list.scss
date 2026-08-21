@@ -61,7 +61,8 @@ table {
 mat-chip.chip-green,
 mat-chip.chip-amber,
 mat-chip.chip-red {
-  width: 72px;
+  min-width: 72px;
+  width: fit-content;
   justify-content: center;
 
   ::ng-deep .mdc-evolution-chip__text-label {
