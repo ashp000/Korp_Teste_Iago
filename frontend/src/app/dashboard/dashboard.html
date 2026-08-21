@@ -37,18 +37,17 @@
     </div>
 
     @if (produtosSaldoBaixo().length > 0) {
-      <mat-card class="alert-banner">
-        <mat-icon color="warn">error_outline</mat-icon>
+      <div class="alert-banner">
+        <mat-icon>error_outline</mat-icon>
         <div class="alert-content">
-          <strong>Alerta de estoque baixo</strong>
-          <ul class="saldo-baixo-list">
-            @for (produto of produtosSaldoBaixo(); track produto.id) {
-              <li>{{ produto.codigo }} — {{ produto.descricao }} (saldo: {{ produto.saldo }})</li>
-            }
-          </ul>
+          <span class="alert-title">Alerta de estoque baixo</span>
+          <span class="alert-summary">
+            {{ produtosSaldoBaixo().length }} produto(s):
+            {{ produtosSaldoBaixo().map((p) => p.codigo).join(', ') }}
+          </span>
         </div>
-        <a mat-flat-button color="accent" routerLink="/produtos">Ajustar estoque</a>
-      </mat-card>
+        <a routerLink="/produtos" class="alert-link">Ajustar estoque</a>
+      </div>
     }
 
     <div class="actions">
