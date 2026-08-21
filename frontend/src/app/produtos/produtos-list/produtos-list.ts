@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, DestroyRef, OnInit, ViewChild, inject, signal } from '@angular/core';
+import { AfterViewChecked, Component, DestroyRef, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -42,7 +42,7 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dial
   templateUrl: './produtos-list.html',
   styleUrl: './produtos-list.scss'
 })
-export class ProdutosListComponent implements OnInit, AfterViewInit {
+export class ProdutosListComponent implements OnInit, AfterViewChecked {
   private produtoService = inject(ProdutoService);
   private notification = inject(NotificationService);
   private fb = inject(FormBuilder);
@@ -81,11 +81,17 @@ export class ProdutosListComponent implements OnInit, AfterViewInit {
       .subscribe((valor) => (this.dataSource.filter = valor.trim().toLowerCase()));
   }
 
-  // ViewChild só fica disponível após a view renderizar — por isso a associação
-  // com o MatSort/MatPaginator acontece aqui, e não no ngOnInit.
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+  // O MatSort/MatPaginator só existem no DOM depois que os produtos carregam (ficam atrás
+  // de um @if de loading/vazio no template), então na primeira checagem de ngAfterViewInit
+  // eles ainda não existem. ngAfterViewChecked roda a cada verificação da view, então pega
+  // o momento em que os elementos realmente aparecem — o guard evita reatribuir à toa.
+  ngAfterViewChecked(): void {
+    if (this.sort && this.dataSource.sort !== this.sort) {
+      this.dataSource.sort = this.sort;
+    }
+    if (this.paginator && this.dataSource.paginator !== this.paginator) {
+      this.dataSource.paginator = this.paginator;
+    }
   }
 
   carregar(): void {
