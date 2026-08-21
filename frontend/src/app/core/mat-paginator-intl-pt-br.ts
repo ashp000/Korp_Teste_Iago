@@ -9,16 +9,15 @@ export function criarMatPaginatorIntlPtBr(): MatPaginatorIntl {
   intl.firstPageLabel = 'Primeira página';
   intl.lastPageLabel = 'Última página';
 
+  // Formato "página atual de total de páginas" (ex: "1 de 5"), em vez do padrão do
+  // Material que mostra o intervalo de itens (ex: "1 – 10 de 47").
   intl.getRangeLabel = (page: number, pageSize: number, length: number): string => {
     if (length === 0 || pageSize === 0) {
-      return `0 de ${length}`;
+      return '0 de 0';
     }
 
     const totalPaginas = Math.ceil(length / pageSize);
-    const paginaAtual = Math.min(page, totalPaginas - 1);
-    const inicio = paginaAtual * pageSize + 1;
-    const fim = Math.min(inicio + pageSize - 1, length);
-    return `${inicio} – ${fim} de ${length}`;
+    return `${page + 1} de ${totalPaginas}`;
   };
 
   return intl;
