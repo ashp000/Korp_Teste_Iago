@@ -8,7 +8,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
@@ -31,7 +30,6 @@ import { Produto } from '../../core/models/produto.model';
     MatIconModule,
     MatProgressSpinnerModule,
     MatChipsModule,
-    MatTableModule,
     MatFormFieldModule,
     MatSelectModule,
     MatInputModule,
@@ -41,7 +39,6 @@ import { Produto } from '../../core/models/produto.model';
   styleUrl: './nota-detail.scss'
 })
 export class NotaDetailComponent implements OnInit {
-  readonly displayedColumns = ['produtoCodigo', 'quantidade'];
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
   private notaFiscalService = inject(NotaFiscalService);
@@ -133,6 +130,14 @@ export class NotaDetailComponent implements OnInit {
       });
   }
 
+  formatarNumero(numero: number): string {
+    return String(numero).padStart(6, '0');
+  }
+
+  descricaoDoProduto(produtoId: number): string {
+    return this.produtos().find((p) => p.id === produtoId)?.descricao ?? '—';
+  }
+
   criarItem(produtoId: number | null = null, quantidade = 1) {
     return this.fb.group({
       produtoId: [produtoId, Validators.required],
@@ -194,32 +199,66 @@ export class NotaDetailComponent implements OnInit {
   async baixarPdf(nota: NotaFiscal): Promise<void> {
     const { jsPDF } = await import('jspdf');
     const doc = new jsPDF();
+    const margemEsquerda = 14;
+    const margemDireita = 196;
 
+    // Cabeçalho: emitente à esquerda, caixa com número/status à direita — mesmo layout
+    // visual da tela/impressão, pra manter consistência entre os dois formatos de saída.
     doc.setFontSize(16);
-    doc.text('KORP ERP — Nota Fiscal', 14, 18);
+    doc.text('KORP ERP', margemEsquerda, 20);
+    doc.setFontSize(9);
+    doc.setTextColor(100);
+    doc.text('Sistema de Emissão de Notas Fiscais', margemEsquerda, 26);
 
+    doc.setTextColor(0);
+    doc.setDrawColor(150);
+    doc.rect(140, 12, 56, 18);
+    doc.setFontSize(8);
+    doc.text('NOTA FISCAL', 144, 17);
     doc.setFontSize(11);
-    doc.text(`Número: ${nota.numero}`, 14, 30);
-    doc.text(`Status: ${nota.status}`, 14, 37);
-    doc.text(`Aberta em: ${new Date(nota.dataAbertura).toLocaleString('pt-BR')}`, 14, 44);
+    doc.text(`Nº ${this.formatarNumero(nota.numero)}`, 144, 23);
+    doc.setFontSize(9);
+    doc.text(`Status: ${nota.status}`, 144, 28);
+
+    doc.setDrawColor(15, 23, 42);
+    doc.setLineWidth(0.6);
+    doc.line(margemEsquerda, 34, margemDireita, 34);
+    doc.setLineWidth(0.2);
+
+    doc.setFontSize(10);
+    doc.setTextColor(0);
+    doc.text(`Data de abertura: ${new Date(nota.dataAbertura).toLocaleString('pt-BR')}`, margemEsquerda, 42);
     if (nota.dataFechamento) {
-      doc.text(`Fechada em: ${new Date(nota.dataFechamento).toLocaleString('pt-BR')}`, 14, 51);
+      doc.text(`Data de fechamento: ${new Date(nota.dataFechamento).toLocaleString('pt-BR')}`, margemEsquerda, 48);
     }
 
-    let y = 65;
-    doc.setFontSize(12);
-    doc.text('Produto', 14, y);
-    doc.text('Quantidade', 140, y);
-    doc.line(14, y + 2, 196, y + 2);
-    y += 10;
+    let y = 60;
+    doc.setFillColor(241, 245, 249);
+    doc.rect(margemEsquerda, y - 5, margemDireita - margemEsquerda, 8, 'F');
+    doc.setFontSize(9);
+    doc.text('CÓDIGO', margemEsquerda + 2, y);
+    doc.text('DESCRIÇÃO', margemEsquerda + 32, y);
+    doc.text('QUANTIDADE', margemDireita - 2, y, { align: 'right' });
+    y += 9;
 
-    doc.setFontSize(11);
+    doc.setFontSize(10);
     for (const item of nota.itens) {
-      doc.text(item.produtoCodigo, 14, y);
-      doc.text(String(item.quantidade), 140, y);
-      y += 8;
+      doc.text(item.produtoCodigo, margemEsquerda + 2, y);
+      doc.text(this.descricaoDoProduto(item.produtoId), margemEsquerda + 32, y);
+      doc.text(String(item.quantidade), margemDireita - 2, y, { align: 'right' });
+      doc.setDrawColor(226, 232, 240);
+      doc.line(margemEsquerda, y + 3, margemDireita, y + 3);
+      y += 9;
     }
 
-    doc.save(`nota-fiscal-${nota.numero}.pdf`);
+    y += 6;
+    doc.setFontSize(9);
+    doc.setTextColor(100);
+    doc.text(`Total de itens: ${nota.itens.length}`, margemEsquerda, y);
+    y += 6;
+    doc.setFontSize(7);
+    doc.text('Documento gerado eletronicamente para fins de demonstração técnica — sem valor fiscal.', margemEsquerda, y);
+
+    doc.save(`nota-fiscal-${this.formatarNumero(nota.numero)}.pdf`);
   }
 }

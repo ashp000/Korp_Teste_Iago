@@ -2,19 +2,36 @@
   @if (carregando()) {
     <div class="loading"><mat-spinner diameter="32"></mat-spinner></div>
   } @else if (nota(); as n) {
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Nota fiscal nº {{ n.numero }}</mat-card-title>
-      </mat-card-header>
+    <mat-card class="nota-doc">
+      <div class="doc-header">
+        <div class="emitente">
+          <span class="emitente-nome">KORP ERP</span>
+          <span class="emitente-sub">Sistema de Emissão de Notas Fiscais</span>
+        </div>
+
+        <div class="doc-number-box">
+          <span class="doc-tipo">Nota Fiscal</span>
+          <span class="doc-numero">Nº {{ formatarNumero(n.numero) }}</span>
+          <mat-chip class="doc-status" [color]="n.status === 'Aberta' ? 'primary' : undefined" selected>
+            {{ n.status }}
+          </mat-chip>
+        </div>
+      </div>
+
+      <div class="doc-datas">
+        <div>
+          <span class="label">Data de abertura</span>
+          <span>{{ n.dataAbertura | date: 'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        @if (n.dataFechamento) {
+          <div>
+            <span class="label">Data de fechamento</span>
+            <span>{{ n.dataFechamento | date: 'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+        }
+      </div>
 
       <mat-card-content>
-        <mat-chip [color]="n.status === 'Aberta' ? 'primary' : undefined" selected>{{ n.status }}</mat-chip>
-
-        <p>Aberta em: {{ n.dataAbertura | date: 'dd/MM/yyyy HH:mm' }}</p>
-        @if (n.dataFechamento) {
-          <p>Fechada em: {{ n.dataFechamento | date: 'dd/MM/yyyy HH:mm' }}</p>
-        }
-
         @if (editando()) {
           <form [formGroup]="form" class="edit-itens-form">
             <div formArrayName="itens" class="itens">
@@ -56,20 +73,29 @@
           </form>
         } @else {
           <div class="table-scroll">
-            <table mat-table [dataSource]="n.itens" class="mat-elevation-z1">
-              <ng-container matColumnDef="produtoCodigo">
-                <th mat-header-cell *matHeaderCellDef>Produto</th>
-                <td mat-cell *matCellDef="let item">{{ item.produtoCodigo }}</td>
-              </ng-container>
-
-              <ng-container matColumnDef="quantidade">
-                <th mat-header-cell *matHeaderCellDef>Quantidade</th>
-                <td mat-cell *matCellDef="let item">{{ item.quantidade }}</td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th class="col-codigo">Código</th>
+                  <th class="col-descricao">Descrição</th>
+                  <th class="col-quantidade">Quantidade</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of n.itens; track item.produtoId) {
+                  <tr>
+                    <td>{{ item.produtoCodigo }}</td>
+                    <td>{{ descricaoDoProduto(item.produtoId) }}</td>
+                    <td class="col-quantidade">{{ item.quantidade }}</td>
+                  </tr>
+                }
+              </tbody>
             </table>
+          </div>
+
+          <div class="doc-footer">
+            <span>Total de itens: {{ n.itens.length }}</span>
+            <span class="doc-disclaimer">Documento gerado eletronicamente para fins de demonstração técnica — sem valor fiscal.</span>
           </div>
         }
 
