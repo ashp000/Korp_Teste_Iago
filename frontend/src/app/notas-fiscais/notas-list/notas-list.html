@@ -1,5 +1,6 @@
 <div class="page">
   <mat-card>
+    <mat-card-content>
     @if (carregando()) {
       <div class="loading"><mat-spinner diameter="32"></mat-spinner></div>
     } @else {
@@ -7,15 +8,15 @@
         <mat-button-toggle-group
           [value]="filtroStatus()"
           (change)="onFiltroStatusChange($event.value)"
-          aria-label="Filtrar por status"
+          [attr.aria-label]="i18n.t('notas.filtrarStatus')"
         >
-          <mat-button-toggle value="Todas">Todas</mat-button-toggle>
-          <mat-button-toggle value="Aberta">Abertas</mat-button-toggle>
-          <mat-button-toggle value="Fechada">Fechadas</mat-button-toggle>
+          <mat-button-toggle value="Todas">{{ i18n.t('notas.todas') }}</mat-button-toggle>
+          <mat-button-toggle value="Aberta">{{ i18n.t('notas.abertas') }}</mat-button-toggle>
+          <mat-button-toggle value="Fechada">{{ i18n.t('notas.fechadas') }}</mat-button-toggle>
         </mat-button-toggle-group>
 
         <mat-form-field appearance="outline" class="busca-field">
-          <mat-label>Buscar por número</mat-label>
+          <mat-label>{{ i18n.t('notas.buscarNumero') }}</mat-label>
           <input matInput [formControl]="buscaControl" />
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
@@ -24,24 +25,26 @@
       <div class="table-scroll">
         <table mat-table [dataSource]="notasPaginadas()" class="mat-elevation-z1">
           <ng-container matColumnDef="numero">
-            <th mat-header-cell *matHeaderCellDef>Número</th>
+            <th mat-header-cell *matHeaderCellDef>{{ i18n.t('notas.numero') }}</th>
             <td mat-cell *matCellDef="let nota">#{{ nota.numero }}</td>
           </ng-container>
 
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef>Status</th>
             <td mat-cell *matCellDef="let nota">
-              <mat-chip [class]="nota.status === 'Aberta' ? 'chip-blue' : 'chip-green'">{{ nota.status }}</mat-chip>
+              <mat-chip [class]="nota.status === 'Aberta' ? 'chip-blue' : 'chip-green'">
+                {{ i18n.statusLabel(nota.status) }}
+              </mat-chip>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="dataAbertura">
-            <th mat-header-cell *matHeaderCellDef>Abertura</th>
-            <td mat-cell *matCellDef="let nota">{{ nota.dataAbertura | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <th mat-header-cell *matHeaderCellDef>{{ i18n.t('notas.dataAbertura') }}</th>
+            <td mat-cell *matCellDef="let nota">{{ i18n.formatDate(nota.dataAbertura) }}</td>
           </ng-container>
 
           <ng-container matColumnDef="itens">
-            <th mat-header-cell *matHeaderCellDef>Itens</th>
+            <th mat-header-cell *matHeaderCellDef>{{ i18n.t('notas.itens') }}</th>
             <td mat-cell *matCellDef="let nota">{{ nota.itens.length }}</td>
           </ng-container>
 
@@ -58,9 +61,9 @@
       @if (notasFiltradas().length === 0) {
         <p class="empty">
           @if (notas().length === 0) {
-            Nenhuma nota fiscal cadastrada ainda.
+            {{ i18n.t('notas.nenhumaNota') }}
           } @else {
-            Nenhuma nota encontrada com esse filtro.
+            {{ i18n.t('notas.nenhumaComFiltro') }}
           }
         </p>
       } @else {
@@ -69,9 +72,11 @@
           [pageSize]="pageSize"
           [pageIndex]="pageIndex()"
           (page)="onPageChange($event)"
+          hidePageSize
           showFirstLastButtons
         ></mat-paginator>
       }
     }
+    </mat-card-content>
   </mat-card>
 </div>

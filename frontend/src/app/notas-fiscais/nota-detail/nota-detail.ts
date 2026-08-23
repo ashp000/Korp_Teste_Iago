@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatCardModule } from '@angular/material/card';
@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
+import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { finalize } from 'rxjs';
@@ -18,6 +18,8 @@ import { ProdutoService } from '../../core/services/produto.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { NotaFiscal } from '../../core/models/nota-fiscal.model';
 import { Produto } from '../../core/models/produto.model';
+import { HelpIconComponent } from '../../shared/help-icon/help-icon';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-nota-detail',
@@ -31,9 +33,10 @@ import { Produto } from '../../core/models/produto.model';
     MatProgressSpinnerModule,
     MatChipsModule,
     MatFormFieldModule,
-    MatSelectModule,
+    MatAutocompleteModule,
     MatInputModule,
-    MatTooltipModule
+    MatTooltipModule,
+    HelpIconComponent
   ],
   templateUrl: './nota-detail.html',
   styleUrl: './nota-detail.scss'
@@ -44,6 +47,7 @@ export class NotaDetailComponent implements OnInit {
   private notaFiscalService = inject(NotaFiscalService);
   private produtoService = inject(ProdutoService);
   private notification = inject(NotificationService);
+  protected i18n = inject(TranslationService);
 
   nota = signal<NotaFiscal | null>(null);
   carregando = signal(true);
@@ -108,7 +112,7 @@ export class NotaDetailComponent implements OnInit {
       .subscribe({
         next: (nota) => {
           this.nota.set(nota);
-          this.notification.success(`Nota ${nota.numero} impressa e fechada com sucesso.`);
+          this.notification.success(this.i18n.t('notaDetail.notaImpressaSucesso', { numero: nota.numero }));
           // window.print() abre o diálogo nativo de impressão do navegador (imprimir na
           // impressora física ou "Salvar como PDF"), com o layout de src/styles.css
           // (@media print) escondendo o restante da aplicação e mostrando só a nota.
@@ -117,14 +121,14 @@ export class NotaDetailComponent implements OnInit {
         error: (err: HttpErrorResponse) => {
           if (err.status === 503) {
             this.estoqueIndisponivel.set(true);
-            this.erroImpressao.set(err.error?.detail ?? 'Estoque indisponível no momento. Tente novamente em instantes.');
+            this.erroImpressao.set(err.error?.detail ?? this.i18n.t('notaDetail.erro503'));
           } else if (err.status === 400) {
-            this.erroImpressao.set(err.error?.detail ?? 'Saldo insuficiente para um ou mais produtos desta nota.');
+            this.erroImpressao.set(err.error?.detail ?? this.i18n.t('notaDetail.erro400'));
           } else if (err.status === 409) {
-            this.erroImpressao.set(err.error?.detail ?? 'Esta nota já está fechada.');
+            this.erroImpressao.set(err.error?.detail ?? this.i18n.t('notaDetail.erro409'));
             this.carregar();
           } else {
-            this.erroImpressao.set('Não foi possível imprimir a nota. Tente novamente.');
+            this.erroImpressao.set(this.i18n.t('notaDetail.erroGenerico'));
           }
         }
       });
@@ -138,11 +142,47 @@ export class NotaDetailComponent implements OnInit {
     return this.produtos().find((p) => p.id === produtoId)?.descricao ?? '—';
   }
 
-  criarItem(produtoId: number | null = null, quantidade = 1) {
-    return this.fb.group({
+  criarItem(produtoId: number | null = null, quantidade: number | null = null) {
+    const produtoInicial = produtoId ? (this.produtos().find((p) => p.id === produtoId) ?? null) : null;
+    const group = this.fb.group({
       produtoId: [produtoId, Validators.required],
-      quantidade: [quantidade, [Validators.required, Validators.min(1)]]
+      // Campo auxiliar só pra digitação/exibição do autocomplete — guarda o produto
+      // selecionado (objeto) ou o texto digitado (string), nunca vai no payload.
+      produtoBusca: [produtoInicial as Produto | string | null],
+      // Campo vazio representa "sem valor digitado ainda" (mostra o placeholder "1" em vez
+      // de um 1 de verdade escrito no input) — e vazio no envio conta como quantidade 1.
+      quantidade: [quantidade, Validators.min(1)]
     });
+
+    // Se o usuário digitar de novo depois de escolher um produto, o produtoId antigo
+    // não pode continuar valendo — senão a nota poderia sair com um produto errado.
+    group.controls.produtoBusca.valueChanges.subscribe((valor) => {
+      if (typeof valor === 'string') {
+        group.controls.produtoId.setValue(null);
+      }
+    });
+
+    return group;
+  }
+
+  produtosFiltrados(index: number): Produto[] {
+    const valor = (this.itens.at(index) as FormGroup).get('produtoBusca')?.value;
+    const termo = typeof valor === 'string' ? valor.trim().toLowerCase() : '';
+    const produtos = this.produtos();
+    if (!termo) return produtos;
+    return produtos.filter(
+      (p) => p.codigo.toLowerCase().includes(termo) || p.descricao.toLowerCase().includes(termo)
+    );
+  }
+
+  displayProduto(produto: Produto | string | null): string {
+    if (!produto || typeof produto === 'string') return produto ?? '';
+    return `${produto.codigo} — ${produto.descricao}`;
+  }
+
+  onProdutoSelecionado(index: number, event: MatAutocompleteSelectedEvent): void {
+    const produto = event.option.value as Produto;
+    (this.itens.at(index) as FormGroup).get('produtoId')?.setValue(produto.id);
   }
 
   // Só faz sentido editar itens de uma nota ainda Aberta — depois de Fechada, os itens já
@@ -177,9 +217,9 @@ export class NotaDetailComponent implements OnInit {
     }
 
     const payload = {
-      itens: this.itens.value.map((item: { produtoId: number; quantidade: number }) => {
+      itens: this.itens.value.map((item: { produtoId: number; quantidade: number | null }) => {
         const produto = this.produtos().find((p) => p.id === item.produtoId);
-        return { produtoId: item.produtoId, produtoCodigo: produto?.codigo ?? '', quantidade: item.quantidade };
+        return { produtoId: item.produtoId, produtoCodigo: produto?.codigo ?? '', quantidade: item.quantidade ?? 1 };
       })
     };
 
@@ -190,7 +230,7 @@ export class NotaDetailComponent implements OnInit {
       .subscribe((nota) => {
         this.nota.set(nota);
         this.editando.set(false);
-        this.notification.success('Itens da nota atualizados.');
+        this.notification.success(this.i18n.t('notaDetail.itensAtualizados'));
       });
   }
 
@@ -205,20 +245,20 @@ export class NotaDetailComponent implements OnInit {
     // Cabeçalho: emitente à esquerda, caixa com número/status à direita — mesmo layout
     // visual da tela/impressão, pra manter consistência entre os dois formatos de saída.
     doc.setFontSize(16);
-    doc.text('KORP ERP', margemEsquerda, 20);
+    doc.text(this.i18n.t('notaDetail.emitenteNome'), margemEsquerda, 20);
     doc.setFontSize(9);
     doc.setTextColor(100);
-    doc.text('Sistema de Emissão de Notas Fiscais', margemEsquerda, 26);
+    doc.text(this.i18n.t('notaDetail.emitenteSub'), margemEsquerda, 26);
 
     doc.setTextColor(0);
     doc.setDrawColor(150);
     doc.rect(140, 12, 56, 18);
     doc.setFontSize(8);
-    doc.text('NOTA FISCAL', 144, 17);
+    doc.text(this.i18n.t('notaDetail.pdfNotaFiscal'), 144, 17);
     doc.setFontSize(11);
-    doc.text(`Nº ${this.formatarNumero(nota.numero)}`, 144, 23);
+    doc.text(this.i18n.t('notaDetail.numeroPrefixo', { numero: this.formatarNumero(nota.numero) }), 144, 23);
     doc.setFontSize(9);
-    doc.text(`Status: ${nota.status}`, 144, 28);
+    doc.text(this.i18n.t('notaDetail.pdfStatusPrefixo', { status: this.i18n.statusLabel(nota.status) }), 144, 28);
 
     doc.setDrawColor(15, 23, 42);
     doc.setLineWidth(0.6);
@@ -227,18 +267,26 @@ export class NotaDetailComponent implements OnInit {
 
     doc.setFontSize(10);
     doc.setTextColor(0);
-    doc.text(`Data de abertura: ${new Date(nota.dataAbertura).toLocaleString('pt-BR')}`, margemEsquerda, 42);
+    doc.text(
+      this.i18n.t('notaDetail.pdfDataAbertura', { data: this.i18n.formatDate(nota.dataAbertura) }),
+      margemEsquerda,
+      42
+    );
     if (nota.dataFechamento) {
-      doc.text(`Data de fechamento: ${new Date(nota.dataFechamento).toLocaleString('pt-BR')}`, margemEsquerda, 48);
+      doc.text(
+        this.i18n.t('notaDetail.pdfDataFechamento', { data: this.i18n.formatDate(nota.dataFechamento) }),
+        margemEsquerda,
+        48
+      );
     }
 
     let y = 60;
     doc.setFillColor(241, 245, 249);
     doc.rect(margemEsquerda, y - 5, margemDireita - margemEsquerda, 8, 'F');
     doc.setFontSize(9);
-    doc.text('CÓDIGO', margemEsquerda + 2, y);
-    doc.text('DESCRIÇÃO', margemEsquerda + 32, y);
-    doc.text('QUANTIDADE', margemDireita - 2, y, { align: 'right' });
+    doc.text(this.i18n.t('notaDetail.pdfCodigo'), margemEsquerda + 2, y);
+    doc.text(this.i18n.t('notaDetail.pdfDescricao'), margemEsquerda + 32, y);
+    doc.text(this.i18n.t('notaDetail.pdfQuantidade'), margemDireita - 2, y, { align: 'right' });
     y += 9;
 
     doc.setFontSize(10);
@@ -254,10 +302,10 @@ export class NotaDetailComponent implements OnInit {
     y += 6;
     doc.setFontSize(9);
     doc.setTextColor(100);
-    doc.text(`Total de itens: ${nota.itens.length}`, margemEsquerda, y);
+    doc.text(this.i18n.t('notaDetail.totalItens', { total: nota.itens.length }), margemEsquerda, y);
     y += 6;
     doc.setFontSize(7);
-    doc.text('Documento gerado eletronicamente para fins de demonstração técnica — sem valor fiscal.', margemEsquerda, y);
+    doc.text(this.i18n.t('notaDetail.semValorFiscal'), margemEsquerda, y);
 
     doc.save(`nota-fiscal-${this.formatarNumero(nota.numero)}.pdf`);
   }

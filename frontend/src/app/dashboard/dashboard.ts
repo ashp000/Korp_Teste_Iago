@@ -5,13 +5,13 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { finalize, forkJoin } from 'rxjs';
 import { ProdutoService } from '../core/services/produto.service';
 import { NotaFiscalService } from '../core/services/nota-fiscal.service';
 import { Produto } from '../core/models/produto.model';
 import { NotaFiscal } from '../core/models/nota-fiscal.model';
+import { TranslationService } from '../core/services/translation.service';
 
 const SALDO_BAIXO_LIMITE = 5;
 
@@ -24,7 +24,6 @@ const SALDO_BAIXO_LIMITE = 5;
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatTooltipModule,
     MatChipsModule
   ],
   templateUrl: './dashboard.html',
@@ -33,6 +32,7 @@ const SALDO_BAIXO_LIMITE = 5;
 export class DashboardComponent implements OnInit {
   private produtoService = inject(ProdutoService);
   private notaFiscalService = inject(NotaFiscalService);
+  protected i18n = inject(TranslationService);
 
   readonly limiteSaldoBaixo = SALDO_BAIXO_LIMITE;
 
@@ -59,9 +59,5 @@ export class DashboardComponent implements OnInit {
         );
         this.notasRecentes.set(porDataDesc.slice(0, 5));
       });
-  }
-
-  tooltipSaldoBaixo(): string {
-    return 'Estoque baixo: ' + this.produtosSaldoBaixo().map((p) => `${p.codigo} (${p.saldo})`).join(', ');
   }
 }

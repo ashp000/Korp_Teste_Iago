@@ -7,7 +7,7 @@
         <div class="stat-icon blue"><mat-icon>inventory_2</mat-icon></div>
         <div>
           <div class="stat-value">{{ totalProdutos() }}</div>
-          <div class="stat-label">Produtos cadastrados</div>
+          <div class="stat-label">{{ i18n.t('dashboard.produtosCadastrados') }}</div>
         </div>
       </mat-card>
 
@@ -15,7 +15,7 @@
         <div class="stat-icon amber"><mat-icon>warning</mat-icon></div>
         <div>
           <div class="stat-value">{{ produtosSaldoBaixo().length }}</div>
-          <div class="stat-label">Saldo baixo (&lt; {{ limiteSaldoBaixo }})</div>
+          <div class="stat-label">{{ i18n.t('dashboard.saldoBaixo', { limite: limiteSaldoBaixo }) }}</div>
         </div>
       </mat-card>
 
@@ -23,7 +23,7 @@
         <div class="stat-icon slate"><mat-icon>schedule</mat-icon></div>
         <div>
           <div class="stat-value">{{ notasAbertas() }}</div>
-          <div class="stat-label">Notas abertas</div>
+          <div class="stat-label">{{ i18n.t('dashboard.notasAbertas') }}</div>
         </div>
       </mat-card>
 
@@ -31,7 +31,7 @@
         <div class="stat-icon emerald"><mat-icon>task_alt</mat-icon></div>
         <div>
           <div class="stat-value">{{ notasFechadas() }}</div>
-          <div class="stat-label">Notas emitidas</div>
+          <div class="stat-label">{{ i18n.t('dashboard.notasEmitidas') }}</div>
         </div>
       </mat-card>
     </div>
@@ -39,44 +39,32 @@
     <div class="actions">
       <a mat-flat-button color="primary" routerLink="/produtos">
         <mat-icon>inventory_2</mat-icon>
-        Ver produtos
+        {{ i18n.t('dashboard.verProdutos') }}
       </a>
       <a mat-stroked-button routerLink="/notas-fiscais/nova">
         <mat-icon>add</mat-icon>
-        Nova nota fiscal
+        {{ i18n.t('dashboard.novaNotaFiscal') }}
       </a>
     </div>
 
     @if (notasRecentes().length > 0) {
       <mat-card class="recentes-card">
         <mat-card-header>
-          <mat-card-title>Notas recentes</mat-card-title>
+          <mat-card-title>{{ i18n.t('dashboard.notasRecentes') }}</mat-card-title>
         </mat-card-header>
         <mat-card-content>
           @for (nota of notasRecentes(); track nota.id) {
             <a [routerLink]="['/notas-fiscais', nota.id]" class="recente-row">
               <span class="recente-numero">#{{ nota.numero }}</span>
               <mat-chip [class]="nota.status === 'Aberta' ? 'chip-blue' : 'chip-green'">
-                {{ nota.status }}
+                {{ i18n.statusLabel(nota.status) }}
               </mat-chip>
-              <span class="recente-data">{{ nota.dataAbertura | date: 'dd/MM/yyyy HH:mm' }}</span>
-              <span class="recente-itens">{{ nota.itens.length }} item(ns)</span>
+              <span class="recente-data">{{ i18n.formatDate(nota.dataAbertura) }}</span>
+              <span class="recente-itens">{{ nota.itens.length }} {{ i18n.t('dashboard.itens') }}</span>
             </a>
           }
         </mat-card-content>
       </mat-card>
-    }
-
-    @if (produtosSaldoBaixo().length > 0) {
-      <a
-        routerLink="/produtos"
-        class="low-stock-badge"
-        [matTooltip]="tooltipSaldoBaixo()"
-        matTooltipPosition="left"
-      >
-        <mat-icon>warning</mat-icon>
-        <span class="low-stock-count">{{ produtosSaldoBaixo().length }}</span>
-      </a>
     }
   }
 </div>

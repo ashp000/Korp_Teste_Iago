@@ -17,6 +17,41 @@ html {
   );
 }
 
+// Tema escuro: reaplica o mesmo mat.theme() com theme-type: dark, escopado na classe que
+// o SettingsService alterna em <html>. Os componentes genuínos do Material (botões, campos,
+// cards, tabelas) seguem os tokens --mat-sys-* automaticamente; só os elementos com cor fixa
+// no CSS (ex: .topbar, fundo da página) precisam de override manual abaixo.
+html.dark-theme {
+  @include mat.theme(
+    (
+      color: (
+        theme-type: dark,
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Inter,
+      density: 0,
+    )
+  );
+
+  // O tema escuro padrão do M3 gera superfícies quase pretas (~#121316), deixando página e
+  // cards praticamente indistinguíveis. Eleva os tons de superfície pra uma paleta slate
+  // mais clara, com degraus de contraste visíveis entre página / card / elementos hover.
+  --mat-sys-background: #0f172a;
+  --mat-sys-surface: #1e293b;
+  --mat-sys-surface-dim: #0f172a;
+  --mat-sys-surface-bright: #334155;
+  --mat-sys-surface-container-lowest: #172233;
+  --mat-sys-surface-container-low: #1e293b;
+  --mat-sys-surface-container: #253449;
+  --mat-sys-surface-container-high: #2c3e56;
+  --mat-sys-surface-container-highest: #334155;
+  --mat-sys-on-surface: #e2e8f0;
+  --mat-sys-on-surface-variant: #94a3b8;
+  --mat-sys-outline: #64748b;
+  --mat-sys-outline-variant: #334155;
+}
+
 body {
   color-scheme: light;
   background-color: #f8fafc;
@@ -24,6 +59,11 @@ body {
   font: var(--mat-sys-body-medium);
   margin: 0;
   height: 100%;
+}
+
+html.dark-theme body {
+  color-scheme: dark;
+  background-color: #0f172a;
 }
 
 /* You can add global styles to this file, and also import other style files */
@@ -35,5 +75,13 @@ body {
   mat-toolbar,
   .mat-mdc-snack-bar-container {
     display: none !important;
+  }
+
+  // O CDK do sidenav reserva um margin-left dinâmico em .mat-sidenav-content do tamanho da
+  // sidebar (pra empurrar o conteúdo pro lado dela) — como só escondemos a sidebar acima e
+  // não disparamos um novo cálculo de layout, essa margem "fantasma" continua valendo na
+  // impressão e desloca todo o conteúdo (inclusive a nota) pra direita.
+  mat-sidenav-content {
+    margin-left: 0 !important;
   }
 }

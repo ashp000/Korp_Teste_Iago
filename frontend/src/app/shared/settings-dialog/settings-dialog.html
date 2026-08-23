@@ -1,0 +1,51 @@
+<h2 mat-dialog-title>{{ i18n.t('configuracoes.titulo') }}</h2>
+
+<mat-dialog-content class="settings-content">
+  <div class="settings-group">
+    <span class="settings-label">{{ i18n.t('configuracoes.tamanhoFonte') }}</span>
+    <mat-button-toggle-group
+      [value]="settings.fontSize()"
+      (change)="onFontSizeChange($event.value)"
+      [attr.aria-label]="i18n.t('configuracoes.tamanhoFonte')"
+    >
+      <mat-button-toggle value="pequena">{{ i18n.t('configuracoes.pequena') }}</mat-button-toggle>
+      <mat-button-toggle value="media">{{ i18n.t('configuracoes.media') }}</mat-button-toggle>
+      <mat-button-toggle value="grande">{{ i18n.t('configuracoes.grande') }}</mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  <div class="settings-group">
+    <span class="settings-label">{{ i18n.t('configuracoes.tema') }}</span>
+    <mat-button-toggle-group
+      [value]="settings.tema()"
+      (change)="onTemaChange($event.value)"
+      [attr.aria-label]="i18n.t('configuracoes.tema')"
+    >
+      <mat-button-toggle value="claro">
+        <mat-icon>light_mode</mat-icon>
+        {{ i18n.t('configuracoes.claro') }}
+      </mat-button-toggle>
+      <mat-button-toggle value="escuro">
+        <mat-icon>dark_mode</mat-icon>
+        {{ i18n.t('configuracoes.escuro') }}
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  <div class="settings-group">
+    <span class="settings-label">{{ i18n.t('configuracoes.idioma') }}</span>
+    <mat-button-toggle-group
+      [value]="i18n.idioma()"
+      (change)="onIdiomaChange($event.value)"
+      [attr.aria-label]="i18n.t('configuracoes.idioma')"
+    >
+      <mat-button-toggle value="pt">Português</mat-button-toggle>
+      <mat-button-toggle value="en">English</mat-button-toggle>
+      <mat-button-toggle value="es">Español</mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-flat-button color="primary" [mat-dialog-close]="true">{{ i18n.t('common.fechar') }}</button>
+</mat-dialog-actions>

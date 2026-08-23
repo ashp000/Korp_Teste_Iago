@@ -20,6 +20,126 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+    overflow-x: hidden;
+  }
+}
+
+// Sidebar "hover-expand": no desktop ela fica só com ícones (72px) e expande suavemente
+// ao passar o mouse, mostrando os textos — mesma ideia do componente de sidebar da
+// Aceternity UI, recriada em CSS puro (sem depender de React/Framer Motion/Tailwind).
+.sidebar.collapsible {
+  width: 72px;
+  transition: width 0.25s ease;
+
+  .brand-text,
+  mat-nav-list a span[matListItemTitle],
+  .sidebar-footer-text {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  // O texto continua ocupando espaço no layout mesmo com opacity:0, o que empurra o
+  // ícone/logo pro lado errado — tirar ele do fluxo (flex-basis 0) é o que realmente
+  // centraliza o que fica visível.
+  .brand-text {
+    flex: 0 0 0;
+    width: 0;
+    overflow: hidden;
+    transition:
+      opacity 0.15s ease,
+      flex-basis 0.25s ease;
+  }
+
+  .brand {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+    gap: 0;
+    transition: gap 0.25s ease;
+  }
+
+  .sidebar-footer {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+    gap: 0;
+    transition: gap 0.25s ease;
+  }
+
+  .sidebar-footer-text {
+    flex: 0 0 0;
+    width: 0;
+    overflow: hidden;
+  }
+
+  &:hover {
+    width: 260px;
+
+    .brand-text,
+    mat-nav-list a span[matListItemTitle],
+    .sidebar-footer-text {
+      opacity: 1;
+    }
+
+    .brand-text,
+    .sidebar-footer-text {
+      flex: 1;
+      width: auto;
+    }
+
+    .brand {
+      justify-content: flex-start;
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+      gap: 0.75rem;
+    }
+
+    .sidebar-footer {
+      justify-content: flex-start;
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+      gap: 0.5rem;
+    }
+  }
+
+  // Centraliza o ícone quando só ele está visível: por padrão o Material reserva um
+  // espaço fixo à esquerda (pro texto) e à direita do ícone, então sem esse ajuste ele
+  // fica torto (encostado num lado só) dentro dos 72px colapsados.
+  mat-nav-list a.mdc-list-item {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  mat-nav-list a ::ng-deep .mdc-list-item__start {
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+    transition:
+      margin-inline-start 0.25s ease,
+      margin-inline-end 0.25s ease;
+  }
+
+  mat-nav-list a ::ng-deep .mdc-list-item__content {
+    flex: 0 0 0;
+    width: 0;
+    transition: flex-basis 0.25s ease;
+  }
+
+  &:hover {
+    mat-nav-list a.mdc-list-item {
+      justify-content: flex-start;
+      padding-right: 16px;
+    }
+
+    mat-nav-list a ::ng-deep .mdc-list-item__start {
+      margin-inline-start: 16px;
+      margin-inline-end: 16px;
+    }
+
+    mat-nav-list a ::ng-deep .mdc-list-item__content {
+      flex: 1;
+      width: auto;
+    }
   }
 }
 
@@ -30,6 +150,10 @@
   padding: 0.75rem;
   margin-bottom: 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.brand-text {
+  white-space: nowrap;
 
   h1 {
     margin: 0;
@@ -54,6 +178,7 @@
   border-radius: 0.5rem;
   background: #2563eb;
   color: white;
+  flex-shrink: 0;
 }
 
 mat-nav-list {
@@ -75,6 +200,7 @@ mat-nav-list {
 
     ::ng-deep .mdc-list-item__primary-text {
       color: #cbd5e1;
+      white-space: nowrap;
     }
 
     &.active {
@@ -100,6 +226,10 @@ mat-nav-list {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
   font-size: 0.75rem;
+}
+
+.sidebar-footer-text {
+  white-space: nowrap;
 
   strong {
     display: block;
@@ -137,8 +267,19 @@ mat-nav-list {
   }
 }
 
+:host-context(.dark-theme) .topbar {
+  background: #1e293b;
+  color: #f1f5f9;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 .spacer {
   flex: 1 1 auto;
+}
+
+.low-stock-btn {
+  color: #b45309;
+  margin-right: 0.25rem;
 }
 
 .page-content {

@@ -27,6 +27,10 @@
   button[type='submit'] {
     margin-top: 8px;
   }
+
+  .ia-button {
+    margin-top: 4px;
+  }
 }
 
 .busca-field {
@@ -48,6 +52,10 @@ table {
   width: 100%;
 }
 
+.is-hidden {
+  display: none;
+}
+
 .empty {
   text-align: center;
   color: #64748b;
@@ -56,6 +64,12 @@ table {
 
 .mat-column-saldo {
   text-align: center;
+
+  // mat-sort-header é flex por dentro (texto + seta de ordenação) — text-align não
+  // afeta esse layout, então sem isso o cabeçalho "Saldo" fica desalinhado do chip.
+  ::ng-deep .mat-sort-header-container {
+    justify-content: center;
+  }
 }
 
 mat-chip.chip-green,

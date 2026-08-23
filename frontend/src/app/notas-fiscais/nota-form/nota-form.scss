@@ -23,6 +23,19 @@
 
 .quantidade-field {
   width: 140px;
+
+  // As setinhas de +/- do input number só aparecem com o campo focado (clicado), não só
+  // ao passar o mouse por cima — evita a distração visual de mostrar controles clicáveis
+  // antes do usuário realmente interagir com o campo.
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    opacity: 0;
+  }
+
+  input[type='number']:focus::-webkit-inner-spin-button,
+  input[type='number']:focus::-webkit-outer-spin-button {
+    opacity: 1;
+  }
 }
 
 .actions {

@@ -1,5 +1,5 @@
 <div class="page">
-  <h2>Nova nota fiscal</h2>
+  <h2>{{ i18n.t('notaForm.titulo') }}</h2>
 
   <mat-card>
     <mat-card-content>
@@ -8,19 +8,40 @@
           @for (item of itens.controls; track item; let i = $index) {
             <div [formGroupName]="i" class="item-row">
               <mat-form-field appearance="outline" class="produto-field">
-                <mat-label>Produto</mat-label>
-                <mat-select formControlName="produtoId">
-                  @for (produto of produtos(); track produto.id) {
-                    <mat-option [value]="produto.id">
-                      {{ produto.codigo }} — {{ produto.descricao }} (saldo: {{ produto.saldo }})
+                <mat-label>{{ i18n.t('campo.produto') }}</mat-label>
+                <input
+                  type="text"
+                  matInput
+                  formControlName="produtoBusca"
+                  [matAutocomplete]="autoProduto"
+                  [placeholder]="i18n.t('notaForm.produtoPlaceholder')"
+                />
+                <mat-autocomplete
+                  #autoProduto="matAutocomplete"
+                  [displayWith]="displayProduto"
+                  (optionSelected)="onProdutoSelecionado(i, $event)"
+                >
+                  @for (produto of produtosFiltrados(i); track produto.id) {
+                    <mat-option [value]="produto">
+                      {{
+                        i18n.t('notaForm.produtoOpcao', {
+                          codigo: produto.codigo,
+                          descricao: produto.descricao,
+                          saldo: produto.saldo
+                        })
+                      }}
                     </mat-option>
+                  } @empty {
+                    <mat-option disabled>{{ i18n.t('notaForm.nenhumProdutoEncontrado') }}</mat-option>
                   }
-                </mat-select>
+                </mat-autocomplete>
+                <app-help-icon matSuffix [text]="i18n.t('notaForm.ajudaProdutoBusca')" />
               </mat-form-field>
 
               <mat-form-field appearance="outline" class="quantidade-field">
-                <mat-label>Quantidade</mat-label>
-                <input matInput type="number" formControlName="quantidade" min="1" />
+                <mat-label>{{ i18n.t('campo.quantidade') }}</mat-label>
+                <input matInput type="number" formControlName="quantidade" min="1" placeholder="1" />
+                <app-help-icon matSuffix [text]="i18n.t('notaForm.ajudaQuantidade')" />
               </mat-form-field>
 
               <button
@@ -28,7 +49,7 @@
                 type="button"
                 (click)="removerItem(i)"
                 [disabled]="itens.length === 1"
-                matTooltip="Remover item"
+                [matTooltip]="i18n.t('notaForm.removerItem')"
               >
                 <mat-icon>delete</mat-icon>
               </button>
@@ -38,16 +59,16 @@
 
         <button mat-stroked-button type="button" (click)="adicionarItem()">
           <mat-icon>add</mat-icon>
-          Adicionar produto
+          {{ i18n.t('notaForm.adicionarProduto') }}
         </button>
 
         <div class="actions">
-          <a mat-button routerLink="/notas-fiscais">Cancelar</a>
+          <a mat-button routerLink="/notas-fiscais">{{ i18n.t('common.cancelar') }}</a>
           <button mat-flat-button color="primary" type="submit" [disabled]="salvando()">
             @if (salvando()) {
               <mat-spinner diameter="18"></mat-spinner>
             } @else {
-              Criar nota
+              {{ i18n.t('notaForm.criarNota') }}
             }
           </button>
         </div>

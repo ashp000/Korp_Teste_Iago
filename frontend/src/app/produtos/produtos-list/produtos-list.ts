@@ -20,6 +20,8 @@ import { NotificationService } from '../../core/services/notification.service';
 import { Produto } from '../../core/models/produto.model';
 import { ProdutoEditDialogComponent } from '../produto-edit-dialog/produto-edit-dialog';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog';
+import { HelpIconComponent } from '../../shared/help-icon/help-icon';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-produtos-list',
@@ -37,7 +39,8 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dial
     MatIconModule,
     MatTooltipModule,
     MatDialogModule,
-    MatChipsModule
+    MatChipsModule,
+    HelpIconComponent
   ],
   templateUrl: './produtos-list.html',
   styleUrl: './produtos-list.scss'
@@ -48,6 +51,7 @@ export class ProdutosListComponent implements OnInit, AfterViewChecked {
   private fb = inject(FormBuilder);
   private dialog = inject(MatDialog);
   private destroyRef = inject(DestroyRef);
+  protected i18n = inject(TranslationService);
 
   readonly displayedColumns = ['codigo', 'descricao', 'saldo', 'acoes'];
   readonly dataSource = new MatTableDataSource<Produto>([]);
@@ -61,10 +65,13 @@ export class ProdutosListComponent implements OnInit, AfterViewChecked {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(FormGroupDirective) formDirective!: FormGroupDirective;
 
-  form = this.fb.nonNullable.group({
-    codigo: ['', [Validators.required, Validators.maxLength(50)]],
-    descricao: ['', [Validators.required, Validators.maxLength(200)]],
-    saldo: [0, [Validators.required, Validators.min(0)]]
+  // Saldo fica como controle nullable (o resto do form é non-nullable): campo vazio no
+  // formulário representa "sem valor digitado ainda", mostrando o placeholder "0" em vez
+  // de um zero de verdade escrito no input — e some vazio conta como saldo 0 no envio.
+  form = this.fb.group({
+    codigo: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(50)]),
+    descricao: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(200)]),
+    saldo: this.fb.control<number | null>(null, [Validators.min(0)])
   });
 
   constructor() {
@@ -106,7 +113,7 @@ export class ProdutosListComponent implements OnInit, AfterViewChecked {
   sugerirDescricao(): void {
     const codigo = this.form.controls.codigo.value;
     if (!codigo) {
-      this.notification.error('Informe o código antes de pedir uma sugestão.');
+      this.notification.error(this.i18n.t('produtos.avisoSemCodigo'));
       return;
     }
 
@@ -123,16 +130,18 @@ export class ProdutosListComponent implements OnInit, AfterViewChecked {
       return;
     }
 
+    const { codigo, descricao, saldo } = this.form.getRawValue();
+
     this.salvando.set(true);
     this.produtoService
-      .criar(this.form.getRawValue())
+      .criar({ codigo, descricao, saldo: saldo ?? 0 })
       .pipe(finalize(() => this.salvando.set(false)))
       .subscribe(() => {
-        this.notification.success('Produto cadastrado com sucesso.');
+        this.notification.success(this.i18n.t('produtos.cadastradoSucesso'));
         // resetForm() (não form.reset()) também limpa o estado "submitted" do <form>,
         // senão o Material continua mostrando erro nos campos obrigatórios vazios mesmo
         // resetados, porque o formulário já foi submetido uma vez.
-        this.formDirective.resetForm({ codigo: '', descricao: '', saldo: 0 });
+        this.formDirective.resetForm({ codigo: '', descricao: '', saldo: null });
         this.carregar();
       });
   }
@@ -144,7 +153,7 @@ export class ProdutosListComponent implements OnInit, AfterViewChecked {
       .subscribe((payload) => {
         if (!payload) return;
         this.produtoService.atualizar(produto.id, payload).subscribe(() => {
-          this.notification.success(`Produto ${produto.codigo} atualizado.`);
+          this.notification.success(this.i18n.t('produtos.atualizadoSucesso', { codigo: produto.codigo }));
           this.carregar();
         });
       });
@@ -154,15 +163,15 @@ export class ProdutosListComponent implements OnInit, AfterViewChecked {
     this.dialog
       .open(ConfirmDialogComponent, {
         data: {
-          titulo: 'Excluir produto',
-          mensagem: `Tem certeza que deseja excluir o produto "${produto.codigo}"? Essa ação não pode ser desfeita.`
+          titulo: this.i18n.t('produtos.confirmarExclusaoTitulo'),
+          mensagem: this.i18n.t('produtos.confirmarExclusaoMensagem', { codigo: produto.codigo })
         }
       })
       .afterClosed()
       .subscribe((confirmado) => {
         if (!confirmado) return;
         this.produtoService.excluir(produto.id).subscribe(() => {
-          this.notification.success(`Produto ${produto.codigo} excluído.`);
+          this.notification.success(this.i18n.t('produtos.excluidoSucesso', { codigo: produto.codigo }));
           this.carregar();
         });
       });

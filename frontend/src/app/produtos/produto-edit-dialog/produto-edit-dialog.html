@@ -1,20 +1,22 @@
-<h2 mat-dialog-title>Editar produto {{ produto.codigo }}</h2>
+<h2 mat-dialog-title>{{ i18n.t('produtoEdit.titulo', { codigo: produto.codigo }) }}</h2>
 
 <mat-dialog-content>
   <form [formGroup]="form" class="edit-form">
     <mat-form-field appearance="outline">
-      <mat-label>Descrição</mat-label>
+      <mat-label>{{ i18n.t('campo.descricao') }}</mat-label>
       <input matInput formControlName="descricao" maxlength="200" />
+      <app-help-icon matSuffix [text]="i18n.t('produtos.ajudaDescricao')" />
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Saldo</mat-label>
+      <mat-label>{{ i18n.t('campo.saldo') }}</mat-label>
       <input matInput type="number" formControlName="saldo" min="0" />
+      <app-help-icon matSuffix [text]="i18n.t('produtoEdit.ajudaSaldo')" />
     </mat-form-field>
   </form>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cancelar</button>
-  <button mat-flat-button color="primary" (click)="salvar()">Salvar</button>
+  <button mat-button mat-dialog-close>{{ i18n.t('common.cancelar') }}</button>
+  <button mat-flat-button color="primary" (click)="salvar()">{{ i18n.t('common.salvar') }}</button>
 </mat-dialog-actions>

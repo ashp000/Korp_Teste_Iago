@@ -2,6 +2,7 @@
   <mat-sidenav
     #drawer
     class="sidebar"
+    [class.collapsible]="!isMobile()"
     [mode]="isMobile() ? 'over' : 'side'"
     [opened]="isMobile() ? sidebarOpen() : true"
     (closed)="sidebarOpen.set(false)"
@@ -10,9 +11,9 @@
       <div class="brand-icon">
         <mat-icon>receipt_long</mat-icon>
       </div>
-      <div>
+      <div class="brand-text">
         <h1>KORP</h1>
-        <span>Emissor Fiscal</span>
+        <span>{{ i18n.t('app.emissorFiscal') }}</span>
       </div>
     </div>
 
@@ -25,23 +26,26 @@
         (click)="closeSidebarIfMobile()"
       >
         <mat-icon matListItemIcon>dashboard</mat-icon>
-        <span matListItemTitle>Dashboard</span>
+        <span matListItemTitle>{{ i18n.t('nav.dashboard') }}</span>
       </a>
       <a mat-list-item routerLink="/produtos" routerLinkActive="active" (click)="closeSidebarIfMobile()">
         <mat-icon matListItemIcon>inventory_2</mat-icon>
-        <span matListItemTitle>Produtos</span>
+        <span matListItemTitle>{{ i18n.t('nav.produtos') }}</span>
       </a>
       <a mat-list-item routerLink="/notas-fiscais" routerLinkActive="active" (click)="closeSidebarIfMobile()">
         <mat-icon matListItemIcon>description</mat-icon>
-        <span matListItemTitle>Notas Fiscais</span>
+        <span matListItemTitle>{{ i18n.t('nav.notasFiscais') }}</span>
+      </a>
+      <a mat-list-item (click)="abrirConfiguracoes()">
+        <mat-icon matListItemIcon>settings</mat-icon>
+        <span matListItemTitle>{{ i18n.t('nav.configuracoes') }}</span>
       </a>
     </mat-nav-list>
 
     <div class="sidebar-footer">
       <div class="status-dot"></div>
-      <div>
-        <strong>Sistema Online</strong>
-        <p>Ambiente de desenvolvimento</p>
+      <div class="sidebar-footer-text">
+        <strong>{{ i18n.t('app.sistemaOnline') }}</strong>
       </div>
     </div>
   </mat-sidenav>
@@ -49,15 +53,31 @@
   <mat-sidenav-content>
     <mat-toolbar class="topbar">
       @if (isMobile()) {
-        <button mat-icon-button (click)="toggleSidebar()" aria-label="Abrir menu">
+        <button mat-icon-button (click)="toggleSidebar()" [attr.aria-label]="i18n.t('app.abrirMenu')">
           <mat-icon>menu</mat-icon>
         </button>
       }
-      <h2>{{ pageTitle() }}</h2>
+      <h2 class="page-title">{{ pageTitle() }}</h2>
       <span class="spacer"></span>
+
+      @if (produtosSaldoBaixo().length > 0) {
+        <button
+          mat-icon-button
+          routerLink="/produtos"
+          [matTooltip]="tooltipSaldoBaixo()"
+          matTooltipPosition="below"
+          class="low-stock-btn"
+          [attr.aria-label]="i18n.t('app.produtosEstoqueBaixo')"
+        >
+          <mat-icon [matBadge]="produtosSaldoBaixo().length" matBadgeColor="warn" matBadgeSize="small">
+            warning
+          </mat-icon>
+        </button>
+      }
+
       <a mat-flat-button color="primary" routerLink="/notas-fiscais/nova">
         <mat-icon>add</mat-icon>
-        Nova Nota Fiscal
+        {{ i18n.t('title.novaNotaFiscal') }}
       </a>
     </mat-toolbar>
 

@@ -16,6 +16,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 import { NotaFiscalService } from '../../core/services/nota-fiscal.service';
 import { NotaFiscal } from '../../core/models/nota-fiscal.model';
+import { TranslationService } from '../../core/services/translation.service';
 
 type FiltroStatus = 'Todas' | 'Aberta' | 'Fechada';
 
@@ -42,6 +43,7 @@ type FiltroStatus = 'Todas' | 'Aberta' | 'Fechada';
 export class NotasListComponent implements OnInit {
   private notaFiscalService = inject(NotaFiscalService);
   private destroyRef = inject(DestroyRef);
+  protected i18n = inject(TranslationService);
 
   readonly displayedColumns = ['numero', 'status', 'dataAbertura', 'itens'];
   readonly buscaControl = new FormControl('', { nonNullable: true });

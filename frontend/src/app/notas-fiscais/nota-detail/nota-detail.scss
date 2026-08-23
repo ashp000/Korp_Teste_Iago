@@ -14,8 +14,38 @@
   overflow-x: auto;
 }
 
+// A nota fiscal simula um documento impresso de verdade, então fica sempre em "papel"
+// claro — como um PDF/documento aberto dentro de um app em modo escuro — em vez de seguir
+// o tema da interface (senão vira uma mistura de trechos claros e escuros no meio do card).
+// Além do fundo/texto do card em si, os componentes Material de dentro (chips, botões,
+// spinner) leem cor dos tokens --mat-sys-* do documento inteiro (que o html.dark-theme
+// substitui por valores escuros) — por isso eles são sobrescritos aqui também, com os
+// mesmos valores do tema claro, escopados só a este card.
 .nota-doc {
   border: 1px solid #cbd5e1;
+  background: white;
+  color: #0f172a;
+
+  --mat-sys-primary: #005cbb;
+  --mat-sys-on-primary: #ffffff;
+  --mat-sys-primary-container: #d7e3ff;
+  --mat-sys-on-primary-container: #00458f;
+  --mat-sys-secondary: #565e71;
+  --mat-sys-secondary-container: #dae2f9;
+  --mat-sys-on-secondary-container: #3e4759;
+  --mat-sys-surface: #faf9fd;
+  --mat-sys-surface-bright: #faf9fd;
+  --mat-sys-surface-dim: #dbd9dd;
+  --mat-sys-surface-container-lowest: #ffffff;
+  --mat-sys-surface-container-low: #f4f3f6;
+  --mat-sys-surface-container: #efedf0;
+  --mat-sys-surface-container-high: #e9e7eb;
+  --mat-sys-surface-container-highest: #e3e2e6;
+  --mat-sys-surface-variant: #e0e2ec;
+  --mat-sys-on-surface: #1a1b1f;
+  --mat-sys-on-surface-variant: #44474e;
+  --mat-sys-outline: #74777f;
+  --mat-sys-outline-variant: #c4c6d0;
 }
 
 .doc-header {
@@ -131,7 +161,6 @@
   .doc-disclaimer {
     font-size: 0.7rem;
     color: #94a3b8;
-    font-style: italic;
   }
 }
 
@@ -163,6 +192,19 @@ table {
 
 .quantidade-field {
   width: 140px;
+
+  // As setinhas de +/- do input number só aparecem com o campo focado (clicado), não só
+  // ao passar o mouse por cima — evita a distração visual de mostrar controles clicáveis
+  // antes do usuário realmente interagir com o campo.
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    opacity: 0;
+  }
+
+  input[type='number']:focus::-webkit-inner-spin-button,
+  input[type='number']:focus::-webkit-outer-spin-button {
+    opacity: 1;
+  }
 }
 
 .erro-impressao {
@@ -215,6 +257,8 @@ mat-card-actions {
   }
 
   .nota-doc {
+    max-width: 720px;
+    margin: 0 auto;
     box-shadow: none !important;
   }
 }
