@@ -100,7 +100,7 @@ namespace FaturamentoService.Services
 
             await _estoqueClient.BaixarSaldoAsync(new BaixarSaldoRequest(
                 nota.Id,
-                nota.Itens.Select(i => new BaixarSaldoItemRequest(i.ProdutoId, i.Quantidade)).ToList()));
+                nota.Itens.Select(i => new BaixarSaldoItemRequest(i.Id, i.ProdutoId, i.Quantidade)).ToList()));
 
             nota.Status = StatusNotaFiscal.Fechada;
             nota.DataFechamento = DateTime.UtcNow;

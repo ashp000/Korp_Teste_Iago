@@ -7,11 +7,11 @@ using Polly.Timeout;
 
 namespace FaturamentoService.Clients
 {
-    public record BaixarSaldoItemRequest(int ProdutoId, int Quantidade);
+    public record BaixarSaldoItemRequest(int ItemId, int ProdutoId, int Quantidade);
 
     public record BaixarSaldoRequest(int NotaFiscalId, List<BaixarSaldoItemRequest> Itens);
 
-    public record BaixarSaldoItemResultado(int ProdutoId, int Quantidade, bool JaProcessado);
+    public record BaixarSaldoItemResultado(int ItemId, int ProdutoId, int Quantidade, bool JaProcessado);
 
     public record BaixarSaldoResponse(int NotaFiscalId, List<BaixarSaldoItemResultado> Itens);
 

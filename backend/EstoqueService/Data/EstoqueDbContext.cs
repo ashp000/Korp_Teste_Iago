@@ -21,7 +21,7 @@ namespace EstoqueService.Data
                 .IsUnique();
 
             modelBuilder.Entity<MovimentacaoEstoque>()
-                .HasIndex(m => new { m.NotaFiscalId, m.ProdutoId })
+                .HasIndex(m => new { m.NotaFiscalId, m.NotaFiscalItemId })
                 .IsUnique();
         }
     }

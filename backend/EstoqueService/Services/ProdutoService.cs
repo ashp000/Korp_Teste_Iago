@@ -83,21 +83,23 @@ namespace EstoqueService.Services
 
         // Decremento atômico via ExecuteUpdateAsync (UPDATE ... WHERE Saldo >= qty no próprio banco,
         // sem carregar a entidade) + registro de MovimentacaoEstoque com índice único em
-        // (NotaFiscalId, ProdutoId): isso resolve concorrência (duas notas disputando o último saldo,
-        // só uma linha é afetada) e idempotência (reenvio da mesma nota não decrementa de novo) juntos.
+        // (NotaFiscalId, NotaFiscalItemId): isso resolve concorrência (duas notas disputando o
+        // último saldo, só uma linha é afetada) e idempotência (reenvio da mesma nota não decrementa
+        // de novo) juntos. A chave é o item da nota (não o produto), pra permitir que o mesmo
+        // produto apareça em duas linhas de uma mesma nota e cada uma baixe estoque separadamente.
         public async Task<BaixarSaldoResponse> BaixarSaldoAsync(BaixarSaldoRequest request)
         {
             var jaProcessados = await _db.Movimentacoes
                 .Where(m => m.NotaFiscalId == request.NotaFiscalId)
-                .Select(m => m.ProdutoId)
+                .Select(m => m.NotaFiscalItemId)
                 .ToListAsync();
 
             var resultados = new List<BaixarSaldoItemResultado>();
 
-            foreach (var item in request.Itens.Where(i => jaProcessados.Contains(i.ProdutoId)))
-                resultados.Add(new BaixarSaldoItemResultado(item.ProdutoId, item.Quantidade, JaProcessado: true));
+            foreach (var item in request.Itens.Where(i => jaProcessados.Contains(i.ItemId)))
+                resultados.Add(new BaixarSaldoItemResultado(item.ItemId, item.ProdutoId, item.Quantidade, JaProcessado: true));
 
-            var pendentes = request.Itens.Where(i => !jaProcessados.Contains(i.ProdutoId)).ToList();
+            var pendentes = request.Itens.Where(i => !jaProcessados.Contains(i.ItemId)).ToList();
             if (pendentes.Count == 0)
                 return new BaixarSaldoResponse(request.NotaFiscalId, resultados);
 
@@ -121,6 +123,7 @@ namespace EstoqueService.Services
                 {
                     ProdutoId = item.ProdutoId,
                     NotaFiscalId = request.NotaFiscalId,
+                    NotaFiscalItemId = item.ItemId,
                     Quantidade = item.Quantidade,
                     DataHora = DateTime.UtcNow
                 });
@@ -131,17 +134,17 @@ namespace EstoqueService.Services
                 }
                 catch (DbUpdateException ex) when (ex.InnerException is PostgresException { SqlState: "23505" })
                 {
-                    // Corrida entre duas tentativas concorrentes da mesma nota: a outra chegou primeiro.
+                    // Corrida entre duas tentativas concorrentes do mesmo item: a outra chegou primeiro.
                     // Desfaz o decremento que acabamos de aplicar e trata como já processado (idempotente).
                     _db.ChangeTracker.Clear();
                     await _db.Produtos
                         .Where(p => p.Id == item.ProdutoId)
                         .ExecuteUpdateAsync(s => s.SetProperty(p => p.Saldo, p => p.Saldo + item.Quantidade));
-                    resultados.Add(new BaixarSaldoItemResultado(item.ProdutoId, item.Quantidade, JaProcessado: true));
+                    resultados.Add(new BaixarSaldoItemResultado(item.ItemId, item.ProdutoId, item.Quantidade, JaProcessado: true));
                     continue;
                 }
 
-                resultados.Add(new BaixarSaldoItemResultado(item.ProdutoId, item.Quantidade, JaProcessado: false));
+                resultados.Add(new BaixarSaldoItemResultado(item.ItemId, item.ProdutoId, item.Quantidade, JaProcessado: false));
             }
 
             await transacao.CommitAsync();
