@@ -24,6 +24,13 @@
   }
 }
 
+// No tema escuro a página de fundo já é bem escura (#0f172a) — a sidebar com a mesma cor fica
+// sem nenhuma separação visual. Deixando ela ainda mais escura cria contraste real entre
+// sidebar / conteúdo, em vez das duas áreas se misturando.
+:host-context(.dark-theme) .sidebar {
+  background: #020617;
+}
+
 // Sidebar "hover-expand": no desktop ela fica só com ícones (72px) e expande suavemente
 // ao passar o mouse, mostrando os textos — mesma ideia do componente de sidebar da
 // Aceternity UI, recriada em CSS puro (sem depender de React/Framer Motion/Tailwind).
@@ -277,9 +284,38 @@ mat-nav-list {
   flex: 1 1 auto;
 }
 
-.low-stock-btn {
+.low-stock-fab {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 20;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  background: white;
   color: #b45309;
-  margin-right: 0.25rem;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.18);
+
+  &:hover {
+    background: #fffbeb;
+  }
+}
+
+:host-context(.dark-theme) .low-stock-fab {
+  background: #1e293b;
+  color: #fbbf24;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+
+  &:hover {
+    background: #253449;
+  }
+}
+
+@media (max-width: 768px) {
+  .low-stock-fab {
+    right: 1rem;
+    bottom: 1rem;
+  }
 }
 
 .page-content {

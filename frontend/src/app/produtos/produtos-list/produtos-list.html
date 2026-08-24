@@ -5,14 +5,14 @@
     </mat-card-header>
     <mat-card-content>
       <form [formGroup]="form" (ngSubmit)="salvar()" class="produto-form">
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="fill">
           <mat-label>{{ i18n.t('campo.codigo') }}</mat-label>
           <input matInput formControlName="codigo" maxlength="50" />
           <app-help-icon matSuffix [text]="i18n.t('produtos.ajudaCodigo')" />
           <mat-error>{{ i18n.t('produtos.erroCodigo') }}</mat-error>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="descricao-field">
+        <mat-form-field appearance="fill" class="descricao-field">
           <mat-label>{{ i18n.t('campo.descricao') }}</mat-label>
           <input matInput formControlName="descricao" maxlength="200" />
           <app-help-icon matSuffix [text]="i18n.t('produtos.ajudaDescricao')" />
@@ -34,7 +34,7 @@
           }
         </button>
 
-        <mat-form-field appearance="outline" class="saldo-field">
+        <mat-form-field appearance="fill" class="saldo-field">
           <mat-label>{{ i18n.t('campo.saldo') }}</mat-label>
           <input matInput type="number" formControlName="saldo" min="0" placeholder="0" />
           <app-help-icon matSuffix [text]="i18n.t('produtos.ajudaSaldo')" />
@@ -59,7 +59,7 @@
       <mat-card-title>{{ i18n.t('dashboard.produtosCadastrados') }}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <mat-form-field appearance="outline" class="busca-field">
+      <mat-form-field appearance="fill" class="busca-field">
         <mat-label>{{ i18n.t('produtos.buscarPlaceholder') }}</mat-label>
         <input matInput [formControl]="busca" />
         <mat-icon matSuffix>search</mat-icon>

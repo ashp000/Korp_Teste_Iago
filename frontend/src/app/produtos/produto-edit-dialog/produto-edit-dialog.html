@@ -2,15 +2,15 @@
 
 <mat-dialog-content>
   <form [formGroup]="form" class="edit-form">
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="fill">
       <mat-label>{{ i18n.t('campo.descricao') }}</mat-label>
       <input matInput formControlName="descricao" maxlength="200" />
       <app-help-icon matSuffix [text]="i18n.t('produtos.ajudaDescricao')" />
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="fill">
       <mat-label>{{ i18n.t('campo.saldo') }}</mat-label>
-      <input matInput type="number" formControlName="saldo" min="0" />
+      <input matInput type="number" formControlName="saldo" min="0" (focus)="selecionarTudo($event)" />
       <app-help-icon matSuffix [text]="i18n.t('produtoEdit.ajudaSaldo')" />
     </mat-form-field>
   </form>

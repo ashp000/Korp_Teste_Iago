@@ -72,12 +72,16 @@ export class NotaFormComponent implements OnInit {
       quantidade: [null as number | null, Validators.min(1)]
     });
 
-    // Se o usuário digitar de novo depois de escolher um produto, o produtoId antigo
-    // não pode continuar valendo — senão a nota poderia sair com um produto errado.
+    // Se o usuário digitar de novo depois de escolher um produto, o produtoId antigo não pode
+    // continuar valendo — senão a nota poderia sair com um produto errado. Checagem sem estado
+    // (não compara com a seleção anterior, que já pode ter sido zerada num evento anterior):
+    // sempre que o texto atual bater exatamente com o formato "código — descrição" de algum
+    // produto, o produtoId é restaurado pra aquele produto; senão fica null até uma nova seleção.
+    // Isso cobre o caso de digitar uma letra e apagar, voltando ao texto original.
     group.controls.produtoBusca.valueChanges.subscribe((valor) => {
-      if (typeof valor === 'string') {
-        group.controls.produtoId.setValue(null);
-      }
+      if (typeof valor !== 'string') return;
+      const match = this.produtos().find((p) => this.displayProduto(p) === valor);
+      group.controls.produtoId.setValue(match?.id ?? null);
     });
 
     return group;
@@ -92,9 +96,17 @@ export class NotaFormComponent implements OnInit {
   }
 
   produtosFiltrados(index: number): Produto[] {
-    const valor = (this.itens.at(index) as FormGroup).get('produtoBusca')?.value;
-    const termo = typeof valor === 'string' ? valor.trim().toLowerCase() : '';
+    const item = this.itens.at(index) as FormGroup;
+    const valor = item.get('produtoBusca')?.value;
     const produtos = this.produtos();
+
+    // Texto batendo exatamente com o formato "código — descrição" de um produto (ex: acabou de
+    // selecionar, ou digitou uma letra e apagou) — mostra ele mesmo em vez de "nenhum produto
+    // encontrado", já que esse texto representa uma seleção válida.
+    const matchExato = typeof valor === 'string' && produtos.find((p) => this.displayProduto(p) === valor);
+    if (matchExato) return [matchExato];
+
+    const termo = typeof valor === 'string' ? valor.trim().toLowerCase() : '';
     if (!termo) return produtos;
     return produtos.filter(
       (p) => p.codigo.toLowerCase().includes(termo) || p.descricao.toLowerCase().includes(termo)

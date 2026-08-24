@@ -45,7 +45,7 @@ html.dark-theme {
   --mat-sys-surface-container-low: #1e293b;
   --mat-sys-surface-container: #253449;
   --mat-sys-surface-container-high: #2c3e56;
-  --mat-sys-surface-container-highest: #334155;
+  --mat-sys-surface-container-highest: #475569;
   --mat-sys-on-surface: #e2e8f0;
   --mat-sys-on-surface-variant: #94a3b8;
   --mat-sys-outline: #64748b;
@@ -67,6 +67,20 @@ html.dark-theme body {
 }
 
 /* You can add global styles to this file, and also import other style files */
+
+// Todos os campos do app usam appearance="fill" (não "outline") — o Material tem um bug
+// conhecido no cálculo do recorte da borda pro rótulo flutuante dos campos outline (o texto
+// às vezes sobrepõe a borda, sem relação clara com o que dispara isso), então evitamos esse
+// mecanismo inteiro. Visual minimalista: sem caixa nenhuma, só a linha embaixo do campo (que
+// o próprio "fill" já traz pronta) ficando azul e mais grossa quando o campo é focado.
+.mat-mdc-text-field-wrapper {
+  background-color: transparent;
+}
+
+.mat-mdc-form-field-focus-overlay {
+  background-color: transparent;
+}
+
 
 // Layout do app (sidenav, toolbar, snackbars) não deve aparecer quando o navegador abre o
 // diálogo de impressão a partir da tela de detalhe da nota (window.print()).

@@ -60,21 +60,6 @@
       <h2 class="page-title">{{ pageTitle() }}</h2>
       <span class="spacer"></span>
 
-      @if (produtosSaldoBaixo().length > 0) {
-        <button
-          mat-icon-button
-          routerLink="/produtos"
-          [matTooltip]="tooltipSaldoBaixo()"
-          matTooltipPosition="below"
-          class="low-stock-btn"
-          [attr.aria-label]="i18n.t('app.produtosEstoqueBaixo')"
-        >
-          <mat-icon [matBadge]="produtosSaldoBaixo().length" matBadgeColor="warn" matBadgeSize="small">
-            warning
-          </mat-icon>
-        </button>
-      }
-
       <a mat-flat-button color="primary" routerLink="/notas-fiscais/nova">
         <mat-icon>add</mat-icon>
         {{ i18n.t('title.novaNotaFiscal') }}
@@ -84,5 +69,20 @@
     <main class="page-content">
       <router-outlet />
     </main>
+
+    @if (produtosSaldoBaixo().length > 0) {
+      <button
+        mat-icon-button
+        routerLink="/produtos"
+        [matTooltip]="tooltipSaldoBaixo()"
+        matTooltipPosition="above"
+        class="low-stock-fab"
+        [attr.aria-label]="i18n.t('app.produtosEstoqueBaixo')"
+      >
+        <mat-icon [matBadge]="produtosSaldoBaixo().length" matBadgeColor="warn" matBadgeSize="small">
+          warning
+        </mat-icon>
+      </button>
+    }
   </mat-sidenav-content>
 </mat-sidenav-container>

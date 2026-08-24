@@ -32,6 +32,12 @@ export class ProdutoEditDialogComponent {
     saldo: [this.produto.saldo, [Validators.required, Validators.min(0)]]
   });
 
+  // Seleciona o valor inteiro do saldo ao focar o campo — digitar direto substitui o número
+  // já cadastrado em vez de inserir no meio dele (evitando ter que apagar manualmente antes).
+  selecionarTudo(event: FocusEvent): void {
+    (event.target as HTMLInputElement).select();
+  }
+
   salvar(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();

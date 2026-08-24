@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { BreakpointObserver } from '@angular/cdk/layout';
@@ -12,6 +12,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { filter, map } from 'rxjs';
 import { ProdutoService } from './core/services/produto.service';
+import { NotaFiscalService } from './core/services/nota-fiscal.service';
 import { Produto } from './core/models/produto.model';
 import { TranslationService } from './core/services/translation.service';
 import { SettingsService } from './core/services/settings.service';
@@ -42,6 +43,7 @@ export class App {
   private router = inject(Router);
   private activatedRoute = inject(ActivatedRoute);
   private produtoService = inject(ProdutoService);
+  private notaFiscalService = inject(NotaFiscalService);
   private dialog = inject(MatDialog);
   protected i18n = inject(TranslationService);
   // Injetado aqui (não só no diálogo de configurações) pra forçar a criação do service e
@@ -75,12 +77,19 @@ export class App {
   });
 
   constructor() {
-    this.carregarSaldoBaixo();
     // Refaz a checagem a cada navegação — assim o badge reflete mudanças de saldo feitas
     // em outra tela (ex: imprimir uma nota abate estoque) sem precisar de um store global.
     this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe(() => this.carregarSaldoBaixo());
+
+    // Além da navegação, também refaz quando o saldo muda sem trocar de rota — ex: editar o
+    // saldo de um produto que estava em falta enquanto a tela de Produtos continua aberta.
+    effect(() => {
+      this.produtoService.alterado();
+      this.notaFiscalService.estoqueAlterado();
+      this.carregarSaldoBaixo();
+    });
   }
 
   tooltipSaldoBaixo(): string {

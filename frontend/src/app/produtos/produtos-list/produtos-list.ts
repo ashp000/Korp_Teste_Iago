@@ -147,8 +147,12 @@ export class ProdutosListComponent implements OnInit, AfterViewChecked {
   }
 
   editar(produto: Produto): void {
+    // autoFocus: false — o foco automático do CDK no primeiro campo, disparado no meio da
+    // animação de abertura do diálogo, corria com o cálculo interno do Material Design pra
+    // posicionar o rótulo flutuante daquele campo, deixando o texto ("Descrição*") sobreposto
+    // à borda só nele (o campo "Saldo", que nunca recebia foco automático, sempre ficou certo).
     this.dialog
-      .open(ProdutoEditDialogComponent, { data: produto })
+      .open(ProdutoEditDialogComponent, { data: produto, autoFocus: false })
       .afterClosed()
       .subscribe((payload) => {
         if (!payload) return;

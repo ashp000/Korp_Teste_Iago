@@ -7,7 +7,7 @@
         <div formArrayName="itens" class="itens">
           @for (item of itens.controls; track item; let i = $index) {
             <div [formGroupName]="i" class="item-row">
-              <mat-form-field appearance="outline" class="produto-field">
+              <mat-form-field appearance="fill" class="produto-field">
                 <mat-label>{{ i18n.t('campo.produto') }}</mat-label>
                 <input
                   type="text"
@@ -38,7 +38,7 @@
                 <app-help-icon matSuffix [text]="i18n.t('notaForm.ajudaProdutoBusca')" />
               </mat-form-field>
 
-              <mat-form-field appearance="outline" class="quantidade-field">
+              <mat-form-field appearance="fill" class="quantidade-field">
                 <mat-label>{{ i18n.t('campo.quantidade') }}</mat-label>
                 <input matInput type="number" formControlName="quantidade" min="1" placeholder="1" />
                 <app-help-icon matSuffix [text]="i18n.t('notaForm.ajudaQuantidade')" />

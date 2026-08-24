@@ -35,7 +35,7 @@ table {
   cursor: pointer;
 
   &:hover {
-    background: #f8fafc;
+    background: var(--mat-sys-surface-container-highest);
   }
 }
 
