@@ -22,7 +22,7 @@ Sistema de Emissão de Notas Fiscais — Teste técnico KORP ERP.
 
 - **Concorrência:** a baixa de saldo (`POST /api/produtos/baixar-saldo` no EstoqueService) usa `ExecuteUpdateAsync` do EF Core para gerar um `UPDATE ... WHERE Saldo >= quantidade` atômico no próprio banco — sem carregar a entidade em memória. Quando duas notas disputam o último saldo, apenas uma linha é afetada; a outra chamada recebe 0 linhas afetadas e retorna "saldo insuficiente".
 - **Idempotência:** cada baixa de saldo grava uma `MovimentacaoEstoque` com índice único em `(NotaFiscalId, NotaFiscalItemId)` — a chave é o item da nota, não o produto, então o mesmo produto pode aparecer em duas linhas da mesma nota e cada uma baixa estoque separadamente. Reenviar a mesma nota (retry de rede, duplo clique, etc.) é detectado antes de decrementar de novo. A numeração de notas fiscais também usa uma `SEQUENCE` nativa do Postgres, atômica por natureza.
-- **Uso de IA:** `POST /api/produtos/sugerir-descricao` no EstoqueService chama a API da Anthropic (SDK oficial `Anthropic` para C#, modelo `claude-opus-5`) para sugerir uma descrição de produto a partir do código digitado. Sem `ANTHROPIC_API_KEY` configurada, ou em caso de falha da IA, o endpoint nunca derruba o cadastro — retorna uma mensagem de fallback para preenchimento manual.
+- **Uso de IA:** `POST /api/produtos/sugerir-descricao` no EstoqueService chama a API da Anthropic (SDK oficial `Anthropic` para C#, modelo `claude-opus-5`) para sugerir uma descrição de produto a partir do código digitado. Sem `ANTHROPIC_API_KEY` configurada, ou em caso de falha da IA, o endpoint nunca derruba o cadastro — retorna uma mensagem de fallback para preenchimento manual. O botão que chamava esse endpoint foi removido da tela de Produtos para esta entrega: a API da Anthropic é paga e não há uma chave disponível para o ambiente de teste, então o endpoint fica implementado e testável diretamente (Swagger/Postman), mas sem um atalho na UI.
 - **Tratamento de falhas:** se o EstoqueService cair, o resilience handler do FaturamentoService tenta novamente automaticamente; se ainda assim falhar, a API retorna `503` e o frontend mostra um estado de erro com botão "Tentar novamente" — sem duplicar a baixa de estoque graças à idempotência acima.
 
 ## Como rodar
@@ -64,7 +64,7 @@ O fluxo completo (cadastro de produto → criação de nota → impressão → b
 
 ## Roteiro sugerido para o vídeo
 
-1. **Cadastro de produtos** — criar produto, usar o botão de sugestão de descrição por IA.
+1. **Cadastro de produtos** — criar produto (a sugestão de descrição por IA está implementada no backend, mas sem botão na UI nesta entrega — API paga, sem chave configurada para o teste).
 2. **Emissão de nota** — criar nota com múltiplos produtos e quantidades; mostrar a numeração sequencial.
 3. **Impressão** — imprimir a nota (botão com spinner), mostrar status virando "Fechada", o PDF sendo baixado automaticamente (gerado no navegador com `jsPDF`) e o saldo abatido na tela de produtos. Tentar imprimir de novo → erro 409 (idempotência da regra de negócio). O botão "Baixar PDF" permite baixar de novo a qualquer momento depois.
 4. **Falha e recuperação:** com os serviços rodando via Docker, pare o container do EstoqueService (`docker stop korp_estoque_service`), tente imprimir uma nota aberta → a UI mostra erro e botão "Tentar novamente"; suba o container de novo (`docker start korp_estoque_service`) e clique em "Tentar novamente" → sucesso.
