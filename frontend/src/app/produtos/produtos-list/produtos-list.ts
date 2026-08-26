@@ -59,7 +59,6 @@ export class ProdutosListComponent implements OnInit, AfterViewChecked {
 
   carregando = signal(true);
   salvando = signal(false);
-  sugerindo = signal(false);
 
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -108,20 +107,6 @@ export class ProdutosListComponent implements OnInit, AfterViewChecked {
       .listar()
       .pipe(finalize(() => this.carregando.set(false)))
       .subscribe((produtos) => (this.dataSource.data = produtos));
-  }
-
-  sugerirDescricao(): void {
-    const codigo = this.form.controls.codigo.value;
-    if (!codigo) {
-      this.notification.error(this.i18n.t('produtos.avisoSemCodigo'));
-      return;
-    }
-
-    this.sugerindo.set(true);
-    this.produtoService
-      .sugerirDescricao(codigo)
-      .pipe(finalize(() => this.sugerindo.set(false)))
-      .subscribe((resposta) => this.form.controls.descricao.setValue(resposta.descricao));
   }
 
   salvar(): void {

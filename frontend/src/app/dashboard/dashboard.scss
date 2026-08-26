@@ -26,6 +26,7 @@
 
 .stat-card {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 1rem;
   padding: 1.25rem !important;
@@ -55,9 +56,9 @@
     color: #d97706;
   }
 
-  &.slate {
-    background: #f1f5f9;
-    color: #475569;
+  &.indigo {
+    background: #e0e7ff;
+    color: #4338ca;
   }
 
   &.emerald {
@@ -127,6 +128,24 @@
   color: #94a3b8;
   font-size: 0.8rem;
   flex-shrink: 0;
+}
+
+mat-chip.chip-blue,
+mat-chip.chip-green {
+  position: relative;
+  width: 76px;
+  min-width: 76px;
+  max-width: 76px;
+  flex-shrink: 0;
+
+  ::ng-deep .mat-mdc-chip-action-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
 }
 
 mat-chip.chip-blue {

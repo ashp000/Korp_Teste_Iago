@@ -45,6 +45,24 @@ table {
   padding: 2rem 0;
 }
 
+mat-chip.chip-blue,
+mat-chip.chip-green {
+  position: relative;
+  width: 76px;
+  min-width: 76px;
+  max-width: 76px;
+  flex-shrink: 0;
+
+  ::ng-deep .mat-mdc-chip-action-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
 mat-chip.chip-blue {
   --mat-chip-label-text-color: #1d4ed8;
   background-color: #dbeafe !important;

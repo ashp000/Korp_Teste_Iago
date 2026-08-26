@@ -23,15 +23,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(AngularDevOrigin, policy =>
-        // SetIsOriginAllowed substitui a checagem padrão do WithOrigins, então a comparação
-        // com localhost precisa entrar no mesmo predicado — libera o Angular dev server local
-        // e os deploys de teste do frontend na Vercel (a URL muda a cada deploy, por isso o
-        // match é pelo domínio do projeto, não por uma URL fixa).
-        policy.SetIsOriginAllowed(origin =>
-                  origin == "http://localhost:4200" ||
-                  (Uri.TryCreate(origin, UriKind.Absolute, out var uri) &&
-                   uri.Host.EndsWith(".vercel.app") &&
-                   uri.Host.StartsWith("korp-teste-iago")))
+        policy.WithOrigins("http://localhost:4200")
               .AllowAnyHeader()
               .AllowAnyMethod());
 });

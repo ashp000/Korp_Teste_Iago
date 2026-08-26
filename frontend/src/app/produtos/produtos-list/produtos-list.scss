@@ -27,10 +27,6 @@
   button[type='submit'] {
     margin-top: 8px;
   }
-
-  .ia-button {
-    margin-top: 4px;
-  }
 }
 
 .busca-field {
@@ -70,6 +66,12 @@ table {
   ::ng-deep .mat-sort-header-container {
     justify-content: center;
   }
+}
+
+.mat-column-acoes {
+  width: 112px;
+  white-space: nowrap;
+  text-align: center;
 }
 
 mat-chip.chip-green,

@@ -10,6 +10,7 @@ export const TRANSLATIONS: Record<Idioma, Record<string, string>> = {
     'common.salvar': 'Salvar',
     'common.editar': 'Editar',
     'common.excluir': 'Excluir',
+    'common.acoes': 'Ações',
     'common.voltar': 'Voltar',
     'common.fechar': 'Fechar',
     'common.un': 'un',
@@ -72,7 +73,7 @@ export const TRANSLATIONS: Record<Idioma, Record<string, string>> = {
     'produtos.excluidoSucesso': 'Produto {codigo} excluído.',
     'produtos.confirmarExclusaoTitulo': 'Excluir produto',
     'produtos.confirmarExclusaoMensagem':
-      'Tem certeza que deseja excluir o produto "{codigo}"? Essa ação não pode ser desfeita.',
+      'Tem certeza que deseja excluir o produto "{codigo}"? Esta ação não pode ser desfeita.',
 
     // Editar produto (diálogo)
     'produtoEdit.titulo': 'Editar produto {codigo}',
@@ -161,6 +162,7 @@ export const TRANSLATIONS: Record<Idioma, Record<string, string>> = {
     'common.salvar': 'Save',
     'common.editar': 'Edit',
     'common.excluir': 'Delete',
+    'common.acoes': 'Actions',
     'common.voltar': 'Back',
     'common.fechar': 'Close',
     'common.un': 'units',
@@ -312,6 +314,7 @@ export const TRANSLATIONS: Record<Idioma, Record<string, string>> = {
     'common.salvar': 'Guardar',
     'common.editar': 'Editar',
     'common.excluir': 'Eliminar',
+    'common.acoes': 'Acciones',
     'common.voltar': 'Volver',
     'common.fechar': 'Cerrar',
     'common.un': 'un',

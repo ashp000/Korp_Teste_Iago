@@ -11,6 +11,7 @@ dist/
 # Ambiente
 .env
 appsettings.Development.json
+appsettings.Development.json.bak
 
 # IDE
 .vs/
