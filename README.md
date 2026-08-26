@@ -62,19 +62,6 @@ npm start   # http://localhost:4200
 
 O fluxo completo (cadastro de produto → criação de nota → impressão → baixa de saldo → idempotência → concorrência) foi validado ponta a ponta desta forma durante o desenvolvimento, direto contra os endpoints da API.
 
-## Roteiro sugerido para o vídeo
-
-1. **Cadastro de produtos** — criar produto (a sugestão de descrição por IA está implementada no backend, mas sem botão na UI nesta entrega — API paga, sem chave configurada para o teste).
-2. **Emissão de nota** — criar nota com múltiplos produtos e quantidades; mostrar a numeração sequencial.
-3. **Impressão** — imprimir a nota (botão com spinner), mostrar status virando "Fechada", o PDF sendo baixado automaticamente (gerado no navegador com `jsPDF`) e o saldo abatido na tela de produtos. Tentar imprimir de novo → erro 409 (idempotência da regra de negócio). O botão "Baixar PDF" permite baixar de novo a qualquer momento depois.
-4. **Falha e recuperação:** com os serviços rodando via Docker, pare o container do EstoqueService (`docker stop korp_estoque_service`), tente imprimir uma nota aberta → a UI mostra erro e botão "Tentar novamente"; suba o container de novo (`docker start korp_estoque_service`) e clique em "Tentar novamente" → sucesso.
-5. **Concorrência:** com um produto de saldo 1, criar duas notas para o mesmo produto e disparar a impressão das duas ao mesmo tempo (duas abas, ou dois `curl`/Postman em paralelo) → só uma fecha, a outra recebe "saldo insuficiente".
-6. **Detalhamento técnico** (falar sobre, com base no código):
-   - **Ciclos de vida Angular usados:** `ngOnInit` (carga inicial de dados em todas as telas), `ngAfterViewChecked` (associação do `MatSort`/`MatPaginator` à tabela de produtos — eles só existem no DOM depois que os produtos carregam, então a conexão precisa ser feita a cada checagem da view, não só uma vez).
-   - **RxJS:** `finalize` (liga/desliga spinners independente de sucesso/erro — inclusive no botão Imprimir), `catchError`/interceptor HTTP funcional para toasts de erro globais, `HttpContext` para a tela de impressão pular o toast genérico e tratar 409/400/503 com UI própria, `debounceTime`/`distinctUntilChanged` nos campos de busca.
-   - **Bibliotecas:** Angular Material (sidenav, tabelas, formulários, diálogos, spinners, chips de status — com tema e CSS customizados pra fugir do visual padrão) + Reactive Forms (`FormArray` para os itens da nota) + `jsPDF` (geração do PDF da nota fiscal no navegador, carregado sob demanda via `import()` dinâmico só quando o usuário imprime/baixa).
-   - **Backend (.NET/C#):** LINQ + `ExecuteUpdateAsync` do EF Core para o decremento atômico; `IExceptionHandler` global mapeando exceções de domínio para `ProblemDetails` com status HTTP corretos (404/409/400/503); `HttpClient` tipado com `AddStandardResilienceHandler` (Polly) para chamada entre microsserviços; SDK oficial da Anthropic para a sugestão por IA.
-
 ## Variáveis de ambiente
 
 Ver `.env.example` na raiz. A única necessária é `ANTHROPIC_API_KEY` (opcional — sem ela, a sugestão de descrição por IA sempre cai no fallback).
