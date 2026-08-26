@@ -51,7 +51,7 @@
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <mat-toolbar class="topbar">
+    <div class="topbar">
       @if (isMobile()) {
         <button mat-icon-button (click)="toggleSidebar()" [attr.aria-label]="i18n.t('app.abrirMenu')">
           <mat-icon>menu</mat-icon>
@@ -64,7 +64,7 @@
         <mat-icon>add</mat-icon>
         {{ i18n.t('title.novaNotaFiscal') }}
       </a>
-    </mat-toolbar>
+    </div>
 
     <main class="page-content">
       <router-outlet />

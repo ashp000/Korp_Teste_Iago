@@ -15,6 +15,10 @@
   flex-direction: column;
   padding: 1rem;
   border-right: none;
+  // O M3 aplica border-radius nos cantos direitos do mat-sidenav em modo "side" por padrão,
+  // deixando um respingo arredondado onde ela encosta na topbar (mais visível no tema escuro,
+  // por causa do contraste de cor entre sidebar/topbar/fundo da página).
+  border-radius: 0;
 
   ::ng-deep .mat-drawer-inner-container {
     display: flex;
@@ -258,14 +262,15 @@ mat-nav-list {
   flex-shrink: 0;
 }
 
+// Antes era um mat-toolbar com fundo/borda próprios (uma "barra" separada da página) — isso
+// dava problema de contraste entre os temas e cortava o canto arredondado da sidebar (ver
+// comentário em .sidebar). Virou uma div simples, sem fundo nem borda: só o título e o botão,
+// soltos no topo da página, sem caixa em volta.
 .topbar {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: white;
+  display: flex;
+  align-items: center;
+  padding: 1.5rem 2rem 0;
   color: #0f172a;
-  border-bottom: 1px solid #e2e8f0;
-  box-shadow: none;
 
   h2 {
     margin: 0 0 0 0.5rem;
@@ -275,9 +280,13 @@ mat-nav-list {
 }
 
 :host-context(.dark-theme) .topbar {
-  background: #1e293b;
   color: #f1f5f9;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    padding: 1rem 1rem 0;
+  }
 }
 
 .spacer {

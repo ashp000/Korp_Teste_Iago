@@ -3,7 +3,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -26,7 +25,6 @@ const SALDO_BAIXO_LIMITE = 5;
     RouterLink,
     RouterLinkActive,
     MatSidenavModule,
-    MatToolbarModule,
     MatListModule,
     MatButtonModule,
     MatIconModule,
